@@ -5,12 +5,13 @@ services:
     build: ./auth-service/
     restart: always
     ports:
-      - 8001:8000
+      - 8000:8000
     deploy:
       mode: replicated
       replicas: 1
     environment:
-      DB_URL: "postgres://user:password@postgres:5432/authdb?sslmode=disable&connect_timeout=5"
+      PORT: "8000"
+      DSN: "postgres://user:password@postgres:5432/authdb?sslmode=disable&connect_timeout=5"
     depends_on:
       - postgres
   postgres:

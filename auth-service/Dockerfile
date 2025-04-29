@@ -4,7 +4,7 @@ WORKDIR /app
 
 # cache dependencies
 # preventing from downloading on every build
-COPY go.mod go.sum .
+COPY go.mod go.sum .env .
 RUN go mod download
 
 COPY . .

@@ -6,23 +6,28 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/cushydigit/microstore/auth-service/internal/database"
 	"github.com/cushydigit/microstore/auth-service/internal/handler"
 	"github.com/cushydigit/microstore/auth-service/internal/repository"
 	"github.com/cushydigit/microstore/auth-service/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// load env
-	if err := godotenv.Load(); err != nil {
-		log.Panic("No .env file found")
+	// get dsn
+	dsn := os.Getenv("DSN")
+	if dsn == "" {
+		log.Panic("DSN not set")
 	}
 
+	// connect to db
+	db := database.ConnectDB(dsn)
+
 	// TEMP: in-memory user storage
-	repo := repository.NewInMemoryUserRepo()
+	// repo := repository.NewInMemoryUserRepo()
+	repo := repository.NewPostgresUserRepo(db)
 	authService := service.NewAuthService(repo)
 	authHandler := handler.NewAuthHandler(authService)
 
