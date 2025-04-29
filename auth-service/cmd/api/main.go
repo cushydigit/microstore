@@ -1,28 +1,59 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/cushydigit/microstore/auth-service/internal/database"
-	"github.com/cushydigit/microstore/auth-service/internal/handlers"
+	"github.com/cushydigit/microstore/auth-service/internal/handler"
+	"github.com/cushydigit/microstore/auth-service/internal/repository"
+	"github.com/cushydigit/microstore/auth-service/internal/service"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"github.com/joho/godotenv"
 )
 
-
 func main() {
-	db, err := database.ConnectDB()
-	if err != nil {
-		log.Fatal(err)
+	// load env
+	if err := godotenv.Load(); err != nil {
+		log.Panic("No .env file found")
 	}
-	defer db.Close()
 
-	mux := http.NewServeMux()
+	// TEMP: in-memory user storage
+	repo := repository.NewInMemoryUserRepo()
+	authService := service.NewAuthService(repo)
+	authHandler := handler.NewAuthHandler(authService)
 
-	mux.HandleFunc("/register", handlers.Register(db))
-	mux.HandleFunc("/login", handlers.Login(db))
+	r := chi.NewRouter()
+	// specify who is allowed to connect
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://*", "https://*"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // seconds
+	}))
 
-	log.Println("Starting Auth Service on :8000")
-	if err := http.ListenAndServe(":8000", mux); err != nil {
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/ping"))
+
+	// routes
+	r.Post("/register", authHandler.Register)
+	r.Post("/login", authHandler.Login)
+
+	port := os.Getenv("PORT")
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", port),
+		Handler: r,
+	}
+
+	log.Printf("Starting Auth Service on: %s\n", port)
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }

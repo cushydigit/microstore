@@ -8,23 +8,22 @@ import (
 )
 
 type UserPayload struct {
-	ID int `json:"id"`
+	ID    int    `json:"id"`
 	Email string `json:"email"`
 }
 
 type LoginPayload struct {
-	Token string `json:"token"`
-	User UserPayload `json:"user"`
+	Token string      `json:"token"`
+	User  UserPayload `json:"user"`
 }
 
 type ResponseJSON struct {
-	Error bool `json:"error"`
+	Error   bool   `json:"error"`
 	Message string `json:"message"`
-	Data any `json:"data,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
-
-func ReadJSON(w http.ResponseWriter, r*http.Request, data any) error {
+func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1024 * 1024 // one megabyte
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
@@ -51,7 +50,7 @@ func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Head
 
 		// add or overwrite with custok headers
 		for key, value := range headers[0] {
-			w.Header()[key] = value	
+			w.Header()[key] = value
 		}
 
 	}
@@ -66,14 +65,13 @@ func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Head
 
 func ErrorJSON(w http.ResponseWriter, err error, status ...int) error {
 	statusCode := http.StatusBadRequest
-	if len (status) > 0 {
+	if len(status) > 0 {
 		statusCode = status[0]
 	}
 
-	var payload ResponseJSON 
+	var payload ResponseJSON
 	payload.Error = true
 	payload.Message = err.Error()
 
 	return WriteJSON(w, statusCode, payload)
 }
-

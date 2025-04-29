@@ -1,4 +1,3 @@
-
 FROM docker.arvancloud.ir/golang:1.24-alpine AS builder
 
 WORKDIR /app
