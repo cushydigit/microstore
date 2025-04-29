@@ -19,6 +19,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/register", handlers.Register(db))
+	mux.HandleFunc("/login", handlers.Login(db))
 
 	log.Println("Starting Auth Service on :8000")
 	if err := http.ListenAndServe(":8000", mux); err != nil {
