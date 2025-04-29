@@ -13,7 +13,6 @@ services:
       DB_URL: "postgres://user:password@postgres:5432/authdb?sslmode=disable&connect_timeout=5"
     depends_on:
       - postgres
-
   postgres:
     image: postgres:14.0
     restart: always
@@ -27,6 +26,7 @@ services:
       POSTGRES_PASSWORD: password 
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
+      - ./db/init-auth.sql:/docker-entrypoint-initdb.d/init-auth.sql 
     command: |
       bash -c "
         docker-entrypoint.sh postgres & 
@@ -36,7 +36,9 @@ services:
         done &&
         psql -U user -tc \"SELECT 1 FROM pg_database WHERE datname = 'authdb';\" | grep -q 1 || psql -U user -c 'CREATE DATABASE authdb;' &&
         psql -U user -tc \"SELECT 1 FROM pg_database WHERE datname = 'productdb';\" | grep -q 1 || psql -U user -c  'CREATE DATABASE productdb;' && 
-        psql -U user -tc \"SELECT 1 FROM pg_database WHERE datname = 'orderdb';\" | grep -q 1 || psql -U user -c 'CREATE DATABASE orderdb;' && 
+        psql -U user -tc \"SELECT 1 FROM pg_database WHERE datname = 'orderdb';\" | grep -q 1 || psql -U user -c 'CREATE DATABASE orderdb;' &&
+        echo 'Running schema for authdb...' &&
+        psql -U user -d authdb -f /docker-entrypoint-initdb.d/init-auth.sql &&
         tail -f /dev/null
       "
-
+  
