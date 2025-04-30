@@ -42,4 +42,3 @@ services:
         psql -U user -d authdb -f /docker-entrypoint-initdb.d/init-auth.sql &&
         tail -f /dev/null
       "
-  
