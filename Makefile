@@ -5,7 +5,7 @@ up:
 down:
 	docker-compose down
 test_auth:
-	@cd ./auth-service/ && go test ./test/
+	@cd ./auth-service/ && go test -count=1 ./test/
 test_product:
-	@cd ./product-service/ && go test ./test/
+	@cd ./product-service/ && go test -count=1 ./test/
 test: test_auth test_product
