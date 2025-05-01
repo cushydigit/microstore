@@ -54,7 +54,7 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		Message: "success",
 		Data:    products,
 	}
-	helpers.WriteJSON(w, http.StatusAccepted, payload)
+	helpers.WriteJSON(w, http.StatusOK, payload)
 }
 
 func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
