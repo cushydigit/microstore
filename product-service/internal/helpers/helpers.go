@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/cushydigit/microstore/porduct-service/internal/types"
+	"github.com/cushydigit/microstore/product-service/internal/types"
 )
 
 func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {

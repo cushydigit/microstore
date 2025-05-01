@@ -7,21 +7,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/cushydigit/microstore/porduct-service/internal/handler"
-	"github.com/cushydigit/microstore/porduct-service/internal/models"
-	"github.com/cushydigit/microstore/porduct-service/internal/repository"
-	"github.com/cushydigit/microstore/porduct-service/internal/service"
+	"github.com/cushydigit/microstore/product-service/internal/handler"
+	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/product-service/internal/repository"
+	"github.com/cushydigit/microstore/product-service/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-
 func setupRouter() http.Handler {
 	repo := repository.NewInMemoryProductRepo()
 	svc := service.NewProductService(repo)
-	h:= handler.NewProductHandler(svc)
+	h := handler.NewProductHandler(svc)
 
-	r:= chi.NewRouter()
+	r := chi.NewRouter()
 	r.Post("/product", h.Create)
 	r.Get("/product", h.GetAll)
 	r.Get("/product/{id}", h.GetByID)
@@ -29,7 +28,6 @@ func setupRouter() http.Handler {
 
 	return r
 }
-
 
 func TestProductHandler(t *testing.T) {
 	r := setupRouter()
@@ -39,16 +37,15 @@ func TestProductHandler(t *testing.T) {
 	resp := httptest.NewRecorder()
 	r.ServeHTTP(resp, req)
 	assert.Equal(t, http.StatusOK, resp.Code)
-	
 
 	// test create
 	product := models.Product{
-		Name: "Apple",
-		Price: 1.23,
+		Name:        "Apple",
+		Price:       1.23,
 		Description: "Red lebonanian apple",
 	}
 
-	body, _ := json.Marshal(product) 
+	body, _ := json.Marshal(product)
 	req = httptest.NewRequest(http.MethodPost, "/product", bytes.NewReader(body))
 	resp = httptest.NewRecorder()
 	r.ServeHTTP(resp, req)
@@ -59,7 +56,7 @@ func TestProductHandler(t *testing.T) {
 	req = httptest.NewRequest(http.MethodGet, "/product", nil)
 	resp = httptest.NewRecorder()
 	r.ServeHTTP(resp, req)
-	assert.Equal(t, http.StatusOK,resp.Code)
+	assert.Equal(t, http.StatusOK, resp.Code)
 
 	// test get by id
 	req = httptest.NewRequest(http.MethodGet, "/product/1", nil)
@@ -67,7 +64,7 @@ func TestProductHandler(t *testing.T) {
 	r.ServeHTTP(resp, req)
 	assert.Equal(t, http.StatusOK, resp.Code)
 
-	// test delete 
+	// test delete
 	req = httptest.NewRequest(http.MethodDelete, "/product/1", nil)
 	resp = httptest.NewRecorder()
 	r.ServeHTTP(resp, req)

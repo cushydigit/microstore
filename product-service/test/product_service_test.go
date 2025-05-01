@@ -3,23 +3,21 @@ package test
 import (
 	"testing"
 
-	"github.com/cushydigit/microstore/porduct-service/internal/models"
-	"github.com/cushydigit/microstore/porduct-service/internal/repository"
-	"github.com/cushydigit/microstore/porduct-service/internal/service"
+	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/product-service/internal/repository"
+	"github.com/cushydigit/microstore/product-service/internal/service"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestProductService(t *testing.T) {
 	repo := repository.NewInMemoryProductRepo()
 	svc := service.NewProductService(repo)
 
-	p:= &models.Product{
-		Name: "Test",
+	p := &models.Product{
+		Name:        "Test",
 		Description: "Test product",
-		Price: 9.99,
+		Price:       9.99,
 	}
-
 
 	// test empty projects
 	ps, err := svc.GetAll()
@@ -44,6 +42,5 @@ func TestProductService(t *testing.T) {
 	got, err = svc.GetByID(got.ID)
 	assert.NoError(t, err)
 	assert.Nil(t, got)
-
 
 }

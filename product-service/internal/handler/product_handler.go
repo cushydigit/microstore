@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cushydigit/microstore/porduct-service/internal/helpers"
-	"github.com/cushydigit/microstore/porduct-service/internal/models"
-	"github.com/cushydigit/microstore/porduct-service/internal/service"
-	"github.com/cushydigit/microstore/porduct-service/internal/types"
+	"github.com/cushydigit/microstore/product-service/internal/helpers"
+	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/product-service/internal/service"
+	"github.com/cushydigit/microstore/product-service/internal/types"
 	"github.com/go-chi/chi/v5"
 )
 

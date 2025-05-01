@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/cushydigit/microstore/porduct-service/internal/models"
+	"github.com/cushydigit/microstore/product-service/internal/models"
 )
 
 type PostgresProductRepo struct {

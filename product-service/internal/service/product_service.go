@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/cushydigit/microstore/porduct-service/internal/models"
-	"github.com/cushydigit/microstore/porduct-service/internal/repository"
+	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/product-service/internal/repository"
 )
 
 type ProductService struct {

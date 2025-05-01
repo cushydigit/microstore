@@ -1,4 +1,4 @@
-module github.com/cushydigit/microstore/porduct-service
+module github.com/cushydigit/microstore/product-service
 
 go 1.24.2
 
