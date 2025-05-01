@@ -44,7 +44,7 @@ services:
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
       - ./db/init-auth.sql:/docker-entrypoint-initdb.d/init-auth.sql 
-      - ./db/init-product.sql:/docker-entrypoint-initdb/init-product.sql
+      - ./db/init-product.sql:/docker-entrypoint-initdb.d/init-product.sql
     command: |
       bash -c "
         docker-entrypoint.sh postgres & 
