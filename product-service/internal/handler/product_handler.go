@@ -103,4 +103,3 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 	helpers.WriteJSON(w, http.StatusOK, payload)
 }
-

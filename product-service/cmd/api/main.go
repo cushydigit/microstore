@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	// "github.com/cushydigit/microstore/product-service/internal/database"
+	"github.com/cushydigit/microstore/porduct-service/internal/database"
 	"github.com/cushydigit/microstore/porduct-service/internal/handler"
 	"github.com/cushydigit/microstore/porduct-service/internal/repository"
 	"github.com/cushydigit/microstore/porduct-service/internal/service"
@@ -18,17 +18,17 @@ import (
 
 func main() {
 	// get dsn
-	// dsn := os.Getenv("DSN")
-	// if dsn == "" {
-	// 	log.Panic("DSN not set")
-	// }
+	dsn := os.Getenv("DSN")
+	if dsn == "" {
+		log.Panic("DSN not set")
+	}
 
 	// connect to db
-	// db := database.ConnectDB(dsn)
+	db := database.ConnectDB(dsn)
 
 	// TEMP: in-memory product storage
-	repo := repository.NewInMemoryProductRepo()
-	// repo := repository.PostgresUserRepo(db)
+	// repo := repository.NewInMemoryProductRepo()
+	repo := repository.NewPostgresProductRepo(db)
 	productService := service.NewProductService(repo)
 	productHandler := handler.NewProductHandler(productService)
 
