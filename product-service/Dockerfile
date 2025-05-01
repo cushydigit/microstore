@@ -9,13 +9,13 @@ RUN go mod download
 
 COPY . .
 
-RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/auth-service ./cmd/api/
+RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/product-service ./cmd/api/
 
 FROM docker.arvancloud.ir/alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /bin/auth-service .
+COPY --from=builder /bin/product-service .
 
-CMD ["/app/auth-service"]
+CMD ["/app/product-service"]
 

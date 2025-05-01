@@ -14,6 +14,22 @@ services:
       DSN: "postgres://user:password@postgres:5432/authdb?sslmode=disable&connect_timeout=5"
     depends_on:
       - postgres
+
+  product-service:
+    image: product-service
+    build: ./product-service/
+    restart: always
+    ports:
+      - 8001:8001
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      PORT: "8001"
+      DSN: "postgres://user:password@postgres:5432/productdb?sslmode=disable&connect_timeout=5"
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:14.0
     restart: always
@@ -28,6 +44,7 @@ services:
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
       - ./db/init-auth.sql:/docker-entrypoint-initdb.d/init-auth.sql 
+      - ./db/init-product.sql:/docker-entrypoint-initdb.d/init-product.sql
     command: |
       bash -c "
         docker-entrypoint.sh postgres & 
@@ -40,6 +57,7 @@ services:
         psql -U user -tc \"SELECT 1 FROM pg_database WHERE datname = 'orderdb';\" | grep -q 1 || psql -U user -c 'CREATE DATABASE orderdb;' &&
         echo 'Running schema for authdb...' &&
         psql -U user -d authdb -f /docker-entrypoint-initdb.d/init-auth.sql &&
+        echo 'Running schema for productdb...' &&
+        psql -U user -d productdb -f /docker-entrypoint-initdb.d/init-product.sql &&
         tail -f /dev/null
       "
-  
