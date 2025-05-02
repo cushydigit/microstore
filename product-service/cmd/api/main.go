@@ -13,7 +13,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
 )
 
 func main() {
@@ -33,25 +32,18 @@ func main() {
 	productHandler := handler.NewProductHandler(productService)
 
 	r := chi.NewRouter()
-	// specify who is allowed to connect
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://*", "https://*"},
-		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true,
-		MaxAge:           300, // seconds
-	}))
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
 	// routes
-	r.Post("/product", productHandler.Create)
-	r.Get("/product", productHandler.GetAll)
-	r.Get("/product/:id", productHandler.GetByID)
-	r.Delete("/product/:id", productHandler.Delete)
+	r.Route("/product", func(r chi.Router) {
+		r.Post("/", productHandler.Create)
+		r.Get("/", productHandler.GetAll)
+		r.Get("/{id}", productHandler.GetByID)
+		r.Delete("/{id}", productHandler.Delete)
+	})
 
 	port := os.Getenv("PORT")
 
@@ -60,7 +52,7 @@ func main() {
 		Handler: r,
 	}
 
-	log.Printf("Starting Auth Service on: %s\n", port)
+	log.Printf("Starting Product Service on: %s\n", port)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -30,6 +31,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.ProductService.Create(&p); err != nil {
+		log.Printf("error: %v", err)
 		helpers.ErrorJSON(w, errors.New("failed to create product"), http.StatusInternalServerError)
 		return
 	}

@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS products (
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   price NUMERIC(10, 2) NOT NULL,
-  stock INT NOT NULL,
+  stock INT NOT NULL
 );

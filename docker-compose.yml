@@ -1,16 +1,30 @@
 
 services:
+  gateway:
+    image: gateway
+    build: ./gateway/
+    restart: always
+    ports:
+      - 8080:8080 ## host(localhost):container(inside docker)
+    depends_on:
+      - auth-service
+      - product-service
+    environment:
+      PORT: "8080"
+      JWT_SECRET: "veryverysecretkey"
+
   auth-service:
     image: auth-service
     build: ./auth-service/
     restart: always
     ports:
-      - 8000:8000
+      - 8081:8080
     deploy:
       mode: replicated
       replicas: 1
     environment:
-      PORT: "8000"
+      PORT: "8081"
+      JWT_SECRET: "veryverysecretkey"
       DSN: "postgres://user:password@postgres:5432/authdb?sslmode=disable&connect_timeout=5"
     depends_on:
       - postgres
@@ -20,12 +34,12 @@ services:
     build: ./product-service/
     restart: always
     ports:
-      - 8001:8001
+      - 8082:8080
     deploy:
       mode: replicated
       replicas: 1
     environment:
-      PORT: "8001"
+      PORT: "8082"
       DSN: "postgres://user:password@postgres:5432/productdb?sslmode=disable&connect_timeout=5"
     depends_on:
       - postgres
