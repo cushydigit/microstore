@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -44,7 +45,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		userID := int(claims["user_id"].(float64))
 
 		// Inject int o header fo downstream services
-		r.Header.Set("X-User-ID", string(rune(userID)))
+		r.Header.Set("X-User-ID", strconv.Itoa(userID))
 
 		// Inject into context in the case of future use
 		ctx := context.WithValue(r.Context(), "user_id", userID)

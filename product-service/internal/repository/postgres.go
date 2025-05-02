@@ -17,7 +17,7 @@ func NewPostgresProductRepo(db *sql.DB) *PostgresProductRepo {
 
 func (r *PostgresProductRepo) Create(p *models.Product) error {
 	return r.DB.QueryRow(
-		`INSERT INTO products (name, description, price, stock) VALUES ($1, $2, $3, $4)`,
+		`INSERT INTO products (name, description, price, stock) VALUES ($1, $2, $3, $4) RETURNING id`,
 		p.Name,
 		p.Description,
 		p.Price,
