@@ -44,6 +44,21 @@ services:
     depends_on:
       - postgres
 
+  product-service:
+    image: order-service
+    build: ./order-service/
+    restart: always
+    ports:
+      - 8083:8080
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      PORT: "8083"
+      DSN: "postgres://user:password@postgres:5432/orderdb?sslmode=disable&connect_timeout=5"
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:14.0
     restart: always
@@ -73,5 +88,7 @@ services:
         psql -U user -d authdb -f /docker-entrypoint-initdb.d/init-auth.sql &&
         echo 'Running schema for productdb...' &&
         psql -U user -d productdb -f /docker-entrypoint-initdb.d/init-product.sql &&
+        echo 'Running schema for orderdb...' &&
+        psql -U user -d productdb -f /docker-entrypoint-initdb.d/init-order.sql &&
         tail -f /dev/null
       "
