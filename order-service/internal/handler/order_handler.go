@@ -5,25 +5,23 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cushydigit/microstore/order-service/internal/helpers"
-	"github.com/cushydigit/microstore/order-service/internal/models"
 	"github.com/cushydigit/microstore/order-service/internal/service"
-	"github.com/cushydigit/microstore/order-service/internal/types"
+	"github.com/cushydigit/microstore/shared/helpers"
+	"github.com/cushydigit/microstore/shared/types"
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/oauth2/paypal"
 )
 
 type OrderHandler struct {
 	OrderService *service.OrderService
 }
 
-func NewOrderHandler(orderSevice *service.OrderService) *OrderHandler {
-	return &OrderHandler{OrderService: orderSevice}
+func NewOrderHandler(orderService *service.OrderService) *OrderHandler {
+	return &OrderHandler{OrderService: orderService}
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Items []models.OrderItem `json:"items"`
+		Items []types.OrderItem `json:"items"`
 	}
 	if err := helpers.ReadJSON(w, r, &req); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
@@ -83,9 +81,9 @@ func (h *OrderHandler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payload := types.Response{
-		Error: false,
+		Error:   false,
 		Message: "success",
-		Data: orders,
+		Data:    orders,
 	}
 
 	helpers.WriteJSON(w, http.StatusOK, payload)
@@ -100,9 +98,9 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payload := types.Response{
-		Error: false,
+		Error:   false,
 		Message: "success",
-		Data: orders,
+		Data:    orders,
 	}
 
 	helpers.WriteJSON(w, http.StatusOK, payload)

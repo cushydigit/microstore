@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/cushydigit/microstore/order-service/internal/database"
 	"github.com/cushydigit/microstore/order-service/internal/handler"
 	"github.com/cushydigit/microstore/order-service/internal/repository"
 	"github.com/cushydigit/microstore/order-service/internal/service"
+	"github.com/cushydigit/microstore/shared/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -25,7 +25,7 @@ func main() {
 	db := database.ConnectDB(dsn)
 
 	repo := repository.NewPostgresOrderRepository(db)
-	orderService := service.NewOrderSevice(repo, os.Getenv("PRODUCT_API_URL"))
+	orderService := service.NewOrderService(repo, os.Getenv("PRODUCT_API_URL"))
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	r := chi.NewRouter()
