@@ -1,7 +1,7 @@
 module github.com/cushydigit/microstore/product-service
 
 go 1.24.2
-
+require github.com/cushydigit/microstore/shared v0.1.0
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-chi/chi v1.5.5 // indirect
@@ -12,3 +12,5 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/cushydigit/microstore/shared => ../shared
