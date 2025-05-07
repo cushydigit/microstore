@@ -8,37 +8,43 @@ type AuthRequest struct {
 }
 
 // general response
-type response struct {
+type Response struct {
 	Error   bool   `json:"error"`
 	Message string `json:"message"`
-}
-
-type Response struct {
-	response
-	Data any `json:"data,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 type ProductResponse struct {
-	response
-	Data Product `json:"data"`
+	Error   bool    `json:"error"`
+	Message string  `json:"message"`
+	Data    Product `json:"data"`
 }
 
-type ProductsReponse struct {
-	response
-	Data []Product `json:"data"`
+type ProductsResponse struct {
+	Error   bool      `json:"error"`
+	Message string    `json:"message"`
+	Data    []Product `json:"data"`
 }
 
 type OrderResponse struct {
-	response
-	Data Order `json:"data"`
+	Error   bool   `json:"error"`
+	Message string `json:"message"`
+	Data    Order  `json:"data"`
 }
 
 type OrdersResponse struct {
-	response
-	Data []Order `json:"data"`
+	Error   bool    `json:"error"`
+	Message string  `json:"message"`
+	Data    []Order `json:"data"`
 }
 
 // models types
+type User struct {
+	ID       int    `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"-"`
+}
+
 type Product struct {
 	ID          int64   `json:"id"`
 	Name        string  `json:"name"`
