@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/cushydigit/microstore/product-service/internal/database"
-	"github.com/cushydigit/microstore/product-service/internal/handler"
-	"github.com/cushydigit/microstore/product-service/internal/repository"
-	"github.com/cushydigit/microstore/product-service/internal/service"
-
+	"github.com/cushydigit/microstore/order-service/internal/database"
+	"github.com/cushydigit/microstore/order-service/internal/handler"
+	"github.com/cushydigit/microstore/order-service/internal/repository"
+	"github.com/cushydigit/microstore/order-service/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -25,11 +24,9 @@ func main() {
 	// connect to db
 	db := database.ConnectDB(dsn)
 
-	// TEMP: in-memory product storage
-	// repo := repository.NewInMemoryProductRepo()
-	repo := repository.NewPostgresProductRepo(db)
-	productService := service.NewProductService(repo)
-	productHandler := handler.NewProductHandler(productService)
+	repo := repository.NewPostgresOrderRepository(db)
+	orderService := service.NewOrderSevice(repo, os.Getenv("PRODUCT_API_URL"))
+	orderHandler := handler.NewOrderHandler(orderService)
 
 	r := chi.NewRouter()
 
@@ -38,11 +35,11 @@ func main() {
 	r.Use(middleware.Heartbeat("/ping"))
 
 	// routes
-	r.Route("/product", func(r chi.Router) {
-		r.Post("/", productHandler.Create)
-		r.Get("/", productHandler.GetAll)
-		r.Get("/{id}", productHandler.GetByID)
-		r.Delete("/{id}", productHandler.Delete)
+	r.Route("/order", func(r chi.Router) {
+		r.Post("/", orderHandler.Create)
+		r.Get("/", orderHandler.GetAll)
+		r.Get("/mine", orderHandler.GetByUserID)
+		r.Get("/{id}", orderHandler.GetByID)
 	})
 
 	port := os.Getenv("PORT")
@@ -52,7 +49,7 @@ func main() {
 		Handler: r,
 	}
 
-	log.Printf("Starting Product Service on: %s\n", port)
+	log.Printf("Starting Order Service on: %s\n", port)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
