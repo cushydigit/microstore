@@ -2,15 +2,17 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-const (
-	authEndpoing    = "http://auth-service:8081"
-	productEndpoint = "http://product-service:8082"
+var (
+	authEndpoing    = os.Getenv("AUTH_API_URL")
+	productEndpoint = os.Getenv("PRODUCT_API_URL")
+	orderEndpoint   = os.Getenv("ORDER_API_URL")
 )
 
 func Routes() http.Handler {
@@ -49,6 +51,16 @@ func Routes() http.Handler {
 		// private
 		r.With(AuthMiddleware, AdminMiddlware).Post("/*", ProxyHandler(productEndpoint))
 		r.With(AuthMiddleware, AdminMiddlware).Delete("/*", ProxyHandler(productEndpoint))
+	})
+
+	// order service
+	r.Route("/order", func(r chi.Router) {
+		// private admin route
+		r.With(AuthMiddleware, AdminMiddlware).Get("/", ProxyHandler(orderEndpoint))
+		// private user route
+		r.With(AuthMiddleware).Post("/", ProxyHandler(orderEndpoint))
+		r.With(AuthMiddleware).Get("/mine", ProxyHandler(orderEndpoint))
+		r.With(AuthMiddleware).Get("/{id}", ProxyHandler(orderEndpoint))
 	})
 
 	return r
