@@ -6,29 +6,29 @@ import (
 )
 
 type OrderService struct {
-	Repo repository.OrderRepository
+	Repo          repository.OrderRepository
 	ProductAPIURL string
 }
 
-func NewOrderSevice (repo repository.OrderRepository, productAPIURL string) *OrderService {
+func NewOrderSevice(repo repository.OrderRepository, productAPIURL string) *OrderService {
 	return &OrderService{
-		Repo: repo,
+		Repo:          repo,
 		ProductAPIURL: productAPIURL,
 	}
 }
 
-func (s *OrderService) CreateOrder(userID int, items[]models.OrderItem) (*models.Order, error) {
+func (s *OrderService) Create(userID int, items []models.OrderItem) (*models.Order, error) {
 	return nil, nil
 }
 
-func (s *OrderService) GetOrder(id int64) (*models.Order, error) {
+func (s *OrderService) GetByID(id int64) (*models.Order, error) {
 	return s.Repo.GetByID(id)
 }
 
-func (s *OrderService) GetOrdersByUserID(id int) ([]*models.Order, error ) {
+func (s *OrderService) GetAllByUserID(id int) ([]*models.Order, error) {
 	return s.Repo.GetByUserID(id)
 }
 
-func (s *OrderService) GetAllOrders()([]*models.Order, error) {
-	return s.Repo.GetAll() 
+func (s *OrderService) GetAll() ([]*models.Order, error) {
+	return s.Repo.GetAll()
 }
