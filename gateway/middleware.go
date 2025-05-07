@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cushydigit/microstore/shared/helpers"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -17,13 +19,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			ErrorJSON(w, errors.New("Authorization header missing"), http.StatusUnauthorized)
+			helpers.ErrorJSON(w, errors.New("Authorization header missing"), http.StatusUnauthorized)
 			return
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
-			ErrorJSON(w, errors.New("Invalid token format"), http.StatusUnauthorized)
+			helpers.ErrorJSON(w, errors.New("Invalid token format"), http.StatusUnauthorized)
 			return
 		}
 
@@ -32,13 +34,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		})
 
 		if err != nil || !token.Valid {
-			ErrorJSON(w, errors.New("Invalid or expired token"), http.StatusUnauthorized)
+			helpers.ErrorJSON(w, errors.New("Invalid or expired token"), http.StatusUnauthorized)
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok || claims["user_id"] == nil {
-			ErrorJSON(w, errors.New("Invalid token claims"), http.StatusUnauthorized)
+			helpers.ErrorJSON(w, errors.New("Invalid token claims"), http.StatusUnauthorized)
 			return
 		}
 
@@ -53,12 +55,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func AdminMiddlware(next http.Handler) http.Handler {
+func AdminMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userIDVal := r.Context().Value("user_id")
 		userID, ok := userIDVal.(int)
 		if !ok || userID != 1 {
-			ErrorJSON(w, errors.New("Require admin privilate"), http.StatusForbidden)
+			helpers.ErrorJSON(w, errors.New("Require admin privilate"), http.StatusForbidden)
 			return
 		}
 		next.ServeHTTP(w, r)

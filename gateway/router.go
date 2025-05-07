@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	authEndpoing    = os.Getenv("AUTH_API_URL")
+	authEndpoint    = os.Getenv("AUTH_API_URL")
 	productEndpoint = os.Getenv("PRODUCT_API_URL")
 	orderEndpoint   = os.Getenv("ORDER_API_URL")
 )
@@ -18,7 +18,7 @@ var (
 func Routes() http.Handler {
 	r := chi.NewRouter()
 
-	// Middlawares
+	// Middlewares
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
@@ -40,8 +40,8 @@ func Routes() http.Handler {
 
 	// routes
 	// auth service
-	r.Post("/login", ProxyHandler(authEndpoing))
-	r.Post("/register", ProxyHandler(authEndpoing))
+	r.Post("/login", ProxyHandler(authEndpoint))
+	r.Post("/register", ProxyHandler(authEndpoint))
 
 	// product service
 	r.Route("/product", func(r chi.Router) {
@@ -49,14 +49,14 @@ func Routes() http.Handler {
 		r.Get("/*", ProxyHandler(productEndpoint))
 
 		// private
-		r.With(AuthMiddleware, AdminMiddlware).Post("/*", ProxyHandler(productEndpoint))
-		r.With(AuthMiddleware, AdminMiddlware).Delete("/*", ProxyHandler(productEndpoint))
+		r.With(AuthMiddleware, AdminMiddleware).Post("/*", ProxyHandler(productEndpoint))
+		r.With(AuthMiddleware, AdminMiddleware).Delete("/*", ProxyHandler(productEndpoint))
 	})
 
 	// order service
 	r.Route("/order", func(r chi.Router) {
 		// private admin route
-		r.With(AuthMiddleware, AdminMiddlware).Get("/", ProxyHandler(orderEndpoint))
+		r.With(AuthMiddleware, AdminMiddleware).Get("/", ProxyHandler(orderEndpoint))
 		// private user route
 		r.With(AuthMiddleware).Post("/", ProxyHandler(orderEndpoint))
 		r.With(AuthMiddleware).Get("/mine", ProxyHandler(orderEndpoint))
