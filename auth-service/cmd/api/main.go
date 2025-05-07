@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/cushydigit/microstore/shared/database"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/cushydigit/microstore/auth-service/internal/database"
 	"github.com/cushydigit/microstore/auth-service/internal/handler"
 	"github.com/cushydigit/microstore/auth-service/internal/repository"
 	"github.com/cushydigit/microstore/auth-service/internal/service"
