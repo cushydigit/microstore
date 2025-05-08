@@ -9,4 +9,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 )
 
+require golang.org/x/crypto v0.38.0 // indirect
+
 replace github.com/cushydigit/microstore/shared => ../shared

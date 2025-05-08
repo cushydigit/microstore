@@ -7,6 +7,10 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
+type CreateOrderRequest struct {
+	Items []OrderItem `json:"items"`
+}
+
 // general response
 type Response struct {
 	Error   bool   `json:"error"`

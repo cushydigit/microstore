@@ -20,9 +20,7 @@ func NewOrderHandler(orderService *service.OrderService) *OrderHandler {
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Items []types.OrderItem `json:"items"`
-	}
+	var req types.CreateOrderRequest
 	if err := helpers.ReadJSON(w, r, &req); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
 		return
@@ -36,10 +34,10 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := &types.Response{
+	payload := &types.OrderResponse{
 		Error:   false,
 		Message: "order created",
-		Data:    order,
+		Data:    *order,
 	}
 
 	helpers.WriteJSON(w, http.StatusCreated, payload)
@@ -60,10 +58,10 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.OrderResponse{
 		Error:   false,
 		Message: "success",
-		Data:    order,
+		Data:    *order,
 	}
 
 	helpers.WriteJSON(w, http.StatusOK, payload)
@@ -80,7 +78,7 @@ func (h *OrderHandler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.OrdersResponse{
 		Error:   false,
 		Message: "success",
 		Data:    orders,
@@ -97,7 +95,7 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.OrdersResponse{
 		Error:   false,
 		Message: "success",
 		Data:    orders,

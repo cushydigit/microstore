@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -25,7 +24,7 @@ func NewProductHandler(s *service.ProductService) *ProductHandler {
 
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var p types.Product
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+	if err := helpers.ReadJSON(w, r, &p); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
 		return
 	}
@@ -36,7 +35,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.ProductResponse{
 		Error:   false,
 		Message: "Product created",
 		Data:    p,

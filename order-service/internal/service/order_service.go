@@ -1,7 +1,10 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/cushydigit/microstore/order-service/internal/repository"
@@ -27,28 +30,47 @@ func (s *OrderService) Create(userID int, items []types.OrderItem) (*types.Order
 		return nil, errors.New("no items provided")
 	}
 
-	/* vtotalPrice := 0.0
-	for i, item := range items {
+	totalPrice := 0.0
+	for _, item := range items {
 		resp, err := http.Get(fmt.Sprintf("%s/%d", productEndpoint, item.ProductID))
 		if err != nil || resp.StatusCode != http.StatusOK {
-			return nil, errors.New("failed to fetch product %d", item.ProductID)
+			return nil, fmt.Errorf("failed to fetch product %d", item.ProductID)
 		}
 		defer resp.Body.Close()
 
-		productResp := types.Response{}
-		helpers.ReadJSON(resp.Body)
+		productResp := types.ProductResponse{}
+		if err := json.NewDecoder(resp.Body).Decode(&productResp); err != nil {
+			return nil, errors.New("failed to read response from service")
+		}
+
+		if item.Quantity > productResp.Data.Stock {
+			return nil, fmt.Errorf("product %d out of stock", item.ProductID)
+		}
+
+		totalPrice += productResp.Data.Price * float64(item.Quantity)
 	}
-	*/return nil, nil
+
+	order := &types.Order{
+		UserID:     userID,
+		Items:      items,
+		TotalPrice: totalPrice,
+		Status:     "pending",
+	}
+
+	if err := s.Repo.Create(order); err != nil {
+		return nil, err
+	}
+	return order, nil
 }
 
 func (s *OrderService) GetByID(id int64) (*types.Order, error) {
 	return s.Repo.GetByID(id)
 }
 
-func (s *OrderService) GetAllByUserID(id int) ([]*types.Order, error) {
+func (s *OrderService) GetAllByUserID(id int) ([]types.Order, error) {
 	return s.Repo.GetByUserID(id)
 }
 
-func (s *OrderService) GetAll() ([]*types.Order, error) {
+func (s *OrderService) GetAll() ([]types.Order, error) {
 	return s.Repo.GetAll()
 }
