@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/cushydigit/microstore/auth-service/internal/repository"
-	"github.com/cushydigit/microstore/auth-service/internal/utils"
 	"github.com/cushydigit/microstore/shared/types"
+	"github.com/cushydigit/microstore/shared/utils"
 )
 
 type AuthService struct {
