@@ -1,10 +1,10 @@
 package repository
 
-import "github.com/cushydigit/microstore/product-service/internal/models"
+import "github.com/cushydigit/microstore/shared/types"
 
 type ProductRepository interface {
-	GetByID(id int64) (*models.Product, error)
-	Create(product *models.Product) error
-	GetAll() ([]models.Product, error)
+	GetByID(id int64) (*types.Product, error)
+	Create(product *types.Product) error
+	GetAll() ([]types.Product, error)
 	Delete(id int64) error
 }

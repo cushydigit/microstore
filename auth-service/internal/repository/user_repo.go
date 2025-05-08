@@ -1,8 +1,10 @@
 package repository
 
-import "github.com/cushydigit/microstore/auth-service/internal/models"
+import (
+	"github.com/cushydigit/microstore/shared/types"
+)
 
 type UserRepository interface {
-	FindByEmail(email string) (*models.User, error)
-	Create(user *models.User) error
+	FindByEmail(email string) (*types.User, error)
+	Create(user *types.User) error
 }

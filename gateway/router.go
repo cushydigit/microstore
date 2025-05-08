@@ -2,21 +2,25 @@ package main
 
 import (
 	"net/http"
+	"os"
+
+	"github.com/cushydigit/microstore/shared/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-const (
-	authEndpoing    = "http://auth-service:8081"
-	productEndpoint = "http://product-service:8082"
+var (
+	authEndpoint    = os.Getenv("AUTH_API_URL")
+	productEndpoint = os.Getenv("PRODUCT_API_URL")
+	orderEndpoint   = os.Getenv("ORDER_API_URL")
 )
 
 func Routes() http.Handler {
 	r := chi.NewRouter()
 
-	// Middlawares
+	// Middlewares
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
@@ -38,17 +42,27 @@ func Routes() http.Handler {
 
 	// routes
 	// auth service
-	r.Post("/login", ProxyHandler(authEndpoing))
-	r.Post("/register", ProxyHandler(authEndpoing))
+	r.Post("/login", utils.ProxyHandler(authEndpoint))
+	r.Post("/register", utils.ProxyHandler(authEndpoint))
 
 	// product service
 	r.Route("/product", func(r chi.Router) {
 		// public
-		r.Get("/*", ProxyHandler(productEndpoint))
+		r.Get("/*", utils.ProxyHandler(productEndpoint))
 
 		// private
-		r.With(AuthMiddleware, AdminMiddlware).Post("/*", ProxyHandler(productEndpoint))
-		r.With(AuthMiddleware, AdminMiddlware).Delete("/*", ProxyHandler(productEndpoint))
+		r.With(AuthMiddleware, AdminMiddleware).Post("/*", utils.ProxyHandler(productEndpoint))
+		r.With(AuthMiddleware, AdminMiddleware).Delete("/*", utils.ProxyHandler(productEndpoint))
+	})
+
+	// order service
+	r.Route("/order", func(r chi.Router) {
+		// private admin route
+		r.With(AuthMiddleware, AdminMiddleware).Get("/", utils.ProxyHandler(orderEndpoint))
+		// private user route
+		r.With(AuthMiddleware).Post("/", utils.ProxyHandler(orderEndpoint))
+		r.With(AuthMiddleware).Get("/mine", utils.ProxyHandler(orderEndpoint))
+		r.With(AuthMiddleware).Get("/{id}", utils.ProxyHandler(orderEndpoint))
 	})
 
 	return r

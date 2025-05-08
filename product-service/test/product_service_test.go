@@ -3,9 +3,9 @@ package test
 import (
 	"testing"
 
-	"github.com/cushydigit/microstore/product-service/internal/models"
 	"github.com/cushydigit/microstore/product-service/internal/repository"
 	"github.com/cushydigit/microstore/product-service/internal/service"
+	"github.com/cushydigit/microstore/shared/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +13,7 @@ func TestProductService(t *testing.T) {
 	repo := repository.NewInMemoryProductRepo()
 	svc := service.NewProductService(repo)
 
-	p := &models.Product{
+	p := &types.Product{
 		Name:        "Test",
 		Description: "Test product",
 		Price:       9.99,

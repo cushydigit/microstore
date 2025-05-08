@@ -4,23 +4,23 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/cushydigit/microstore/auth-service/internal/models"
+	"github.com/cushydigit/microstore/shared/types"
 )
 
 type InMemoryUserRepo struct {
-	users map[string]*models.User
+	users map[string]*types.User
 	mu    sync.Mutex
 	idSeq int
 }
 
 func NewInMemoryUserRepo() *InMemoryUserRepo {
 	return &InMemoryUserRepo{
-		users: make(map[string]*models.User),
+		users: make(map[string]*types.User),
 		idSeq: 1,
 	}
 }
 
-func (r *InMemoryUserRepo) FindByEmail(email string) (*models.User, error) {
+func (r *InMemoryUserRepo) FindByEmail(email string) (*types.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -31,7 +31,7 @@ func (r *InMemoryUserRepo) FindByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func (r *InMemoryUserRepo) Create(user *models.User) error {
+func (r *InMemoryUserRepo) Create(user *types.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

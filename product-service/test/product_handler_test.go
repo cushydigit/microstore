@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/cushydigit/microstore/product-service/internal/handler"
-	"github.com/cushydigit/microstore/product-service/internal/models"
 	"github.com/cushydigit/microstore/product-service/internal/repository"
 	"github.com/cushydigit/microstore/product-service/internal/service"
+	"github.com/cushydigit/microstore/shared/types"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -39,7 +39,7 @@ func TestProductHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code)
 
 	// test create
-	product := models.Product{
+	product := types.Product{
 		Name:        "Apple",
 		Price:       1.23,
 		Description: "Red lebonanian apple",

@@ -1,17 +1,16 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/cushydigit/microstore/product-service/internal/helpers"
-	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/shared/helpers"
+	"github.com/cushydigit/microstore/shared/types"
+
 	"github.com/cushydigit/microstore/product-service/internal/service"
-	"github.com/cushydigit/microstore/product-service/internal/types"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -24,8 +23,8 @@ func NewProductHandler(s *service.ProductService) *ProductHandler {
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var p models.Product
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+	var p types.Product
+	if err := helpers.ReadJSON(w, r, &p); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
 		return
 	}
@@ -36,7 +35,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.ProductResponse{
 		Error:   false,
 		Message: "Product created",
 		Data:    p,
@@ -51,7 +50,7 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := types.Response{
+	payload := types.ProductsResponse{
 		Error:   false,
 		Message: "success",
 		Data:    products,
@@ -77,10 +76,10 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		helpers.ErrorJSON(w, errors.New("product not found"), http.StatusNotFound)
 	}
 
-	payload := types.Response{
+	payload := types.ProductResponse{
 		Error:   false,
 		Message: "success",
-		Data:    p,
+		Data:    *p,
 	}
 	helpers.WriteJSON(w, http.StatusOK, payload)
 }
@@ -89,7 +88,7 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		helpers.ErrorJSON(w, errors.New("inalid product ID"))
+		helpers.ErrorJSON(w, errors.New("invalid product ID"))
 		return
 	}
 

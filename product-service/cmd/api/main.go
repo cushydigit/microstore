@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/cushydigit/microstore/product-service/internal/database"
 	"github.com/cushydigit/microstore/product-service/internal/handler"
 	"github.com/cushydigit/microstore/product-service/internal/repository"
 	"github.com/cushydigit/microstore/product-service/internal/service"
+	"github.com/cushydigit/microstore/shared/database"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

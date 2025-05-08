@@ -3,8 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
-
-	"github.com/cushydigit/microstore/auth-service/internal/models"
+	"github.com/cushydigit/microstore/shared/types"
 )
 
 type PostgresUserRepo struct {
@@ -15,13 +14,13 @@ func NewPostgresUserRepo(db *sql.DB) *PostgresUserRepo {
 	return &PostgresUserRepo{DB: db}
 }
 
-func (r *PostgresUserRepo) FindByEmail(email string) (*models.User, error) {
+func (r *PostgresUserRepo) FindByEmail(email string) (*types.User, error) {
 	row := r.DB.QueryRow(
 		`SELECT id, email, password FROM users WHERE email = $1`,
 		email,
 	)
 
-	var user models.User
+	var user types.User
 	err := row.Scan(&user.ID, &user.Email, &user.Password)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -31,7 +30,7 @@ func (r *PostgresUserRepo) FindByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *PostgresUserRepo) Create(user *models.User) error {
+func (r *PostgresUserRepo) Create(user *types.User) error {
 	// check if the user already exists by email
 	existingUser, _ := r.FindByEmail(user.Email)
 	if existingUser != nil {

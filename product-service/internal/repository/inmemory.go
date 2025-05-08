@@ -4,23 +4,24 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/cushydigit/microstore/product-service/internal/models"
+	"github.com/cushydigit/microstore/shared/types"
 )
 
 type InMemoryProductRepo struct {
-	products map[int64]*models.Product
+	products map[int64]*types.Product
 	mu       sync.Mutex
 	nextID   int64
 }
 
 func NewInMemoryProductRepo() ProductRepository {
 	return &InMemoryProductRepo{
-		products: make(map[int64]*models.Product),
+		products: make(map[int64]*types.Product),
 		nextID:   1,
 	}
+
 }
 
-func (r *InMemoryProductRepo) GetByID(id int64) (*models.Product, error) {
+func (r *InMemoryProductRepo) GetByID(id int64) (*types.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -32,7 +33,7 @@ func (r *InMemoryProductRepo) GetByID(id int64) (*models.Product, error) {
 	return product, nil
 }
 
-func (r *InMemoryProductRepo) Create(p *models.Product) error {
+func (r *InMemoryProductRepo) Create(p *types.Product) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -43,11 +44,11 @@ func (r *InMemoryProductRepo) Create(p *models.Product) error {
 	return nil
 }
 
-func (r *InMemoryProductRepo) GetAll() ([]models.Product, error) {
+func (r *InMemoryProductRepo) GetAll() ([]types.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	var products []models.Product
+	var products []types.Product
 	for _, p := range r.products {
 		products = append(products, *p)
 	}

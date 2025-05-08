@@ -1,16 +1,23 @@
+# product-service/Dockerfile => require to build from the root
 FROM docker.arvancloud.ir/golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# cache dependencies
-# preventing from downloading on every build
-COPY go.mod go.sum .env ./
+COPY shared ./shared
+COPY product-service ./product-service
+
+# Download dependencies for shared module
+WORKDIR /app/shared
 RUN go mod download
 
-COPY . .
-
+# Download and build service
+WORKDIR /app/product-service
+RUN go clean -modcache
+RUN go mod tidy
+RUN go mod download
 RUN GOOS=linux CGO_ENABLED=0 go build -o /bin/product-service ./cmd/api/
 
+# --- Final Image ---
 FROM docker.arvancloud.ir/alpine:latest
 
 WORKDIR /app

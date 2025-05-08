@@ -2,20 +2,28 @@
 services:
   gateway:
     image: gateway
-    build: ./gateway/
+    build: 
+      context: .
+      dockerfile: gateway/Dockerfile
     restart: always
     ports:
       - 8080:8080 ## host(localhost):container(inside docker)
     depends_on:
       - auth-service
       - product-service
+      - order-service
     environment:
       PORT: "8080"
       JWT_SECRET: "veryverysecretkey"
+      AUTH_API_URL: "http://auth-service:8081"
+      PRODUCT_API_URL: "http://product-service:8082"
+      ORDER_API_URL: "http://order-service:8083"
 
   auth-service:
     image: auth-service
-    build: ./auth-service/
+    build: 
+      context: .
+      dockerfile: auth-service/Dockerfile
     restart: always
     ports:
       - 8081:8080
@@ -31,7 +39,9 @@ services:
 
   product-service:
     image: product-service
-    build: ./product-service/
+    build: 
+      context: .
+      dockerfile: product-service/Dockerfile
     restart: always
     ports:
       - 8082:8080
@@ -44,8 +54,27 @@ services:
     depends_on:
       - postgres
 
+  order-service:
+    image: order-service
+    build: 
+      context: .
+      dockerfile: order-service/Dockerfile
+    restart: always
+    ports:
+      - 8083:8080
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      PORT: "8083"
+      DSN: "postgres://user:password@postgres:5432/orderdb?sslmode=disable&connect_timeout=5"
+      PRODUCT_API_URL: "http://product-service:8082"
+    depends_on:
+      - postgres
+      - product-service
+
   postgres:
-    image: postgres:14.0
+    image: docker.arvancloud.ir/postgres:14.0
     restart: always
     ports:
       - 5432:5432
@@ -59,6 +88,7 @@ services:
       - ./db-data/postgres/:/var/lib/postgresql/data/
       - ./db/init-auth.sql:/docker-entrypoint-initdb.d/init-auth.sql 
       - ./db/init-product.sql:/docker-entrypoint-initdb.d/init-product.sql
+      - ./db/init-order.sql:/docker-entrypoint-initdb.d/init-order.sql
     command: |
       bash -c "
         docker-entrypoint.sh postgres & 
@@ -73,5 +103,7 @@ services:
         psql -U user -d authdb -f /docker-entrypoint-initdb.d/init-auth.sql &&
         echo 'Running schema for productdb...' &&
         psql -U user -d productdb -f /docker-entrypoint-initdb.d/init-product.sql &&
+        echo 'Running schema for orderdb...' &&
+        psql -U user -d orderdb -f /docker-entrypoint-initdb.d/init-order.sql &&
         tail -f /dev/null
       "

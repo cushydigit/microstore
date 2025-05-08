@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/cushydigit/microstore/auth-service/internal/helpers"
 	"github.com/cushydigit/microstore/auth-service/internal/service"
-	"github.com/cushydigit/microstore/auth-service/internal/types"
+	"github.com/cushydigit/microstore/shared/helpers"
+	"github.com/cushydigit/microstore/shared/types"
 )
 
 type AuthHandler struct {
