@@ -2,7 +2,9 @@
 services:
   gateway:
     image: gateway
-    build: ./gateway/
+    build: 
+      context: .
+      dockerfile: gateway/Dockerfile
     restart: always
     ports:
       - 8080:8080 ## host(localhost):container(inside docker)
@@ -19,7 +21,9 @@ services:
 
   auth-service:
     image: auth-service
-    build: ./auth-service/
+    build: 
+      context: .
+      dockerfile: auth-service/Dockerfile
     restart: always
     ports:
       - 8081:8080
@@ -35,7 +39,9 @@ services:
 
   product-service:
     image: product-service
-    build: ./product-service/
+    build: 
+      context: .
+      dockerfile: product-service/Dockerfile
     restart: always
     ports:
       - 8082:8080
@@ -50,7 +56,9 @@ services:
 
   order-service:
     image: order-service
-    build: ./order-service/
+    build: 
+      context: .
+      dockerfile: order-service/Dockerfile
     restart: always
     ports:
       - 8083:8080
@@ -66,7 +74,7 @@ services:
       - product-service
 
   postgres:
-    image: postgres:14.0
+    image: docker.arvancloud.ir/postgres:14.0
     restart: always
     ports:
       - 5432:5432
