@@ -37,7 +37,7 @@ func main() {
 
 	// routes
 	r.Route("/order", func(r chi.Router) {
-		r.With(middlewares.ProvideUserID)
+		r.Use(middlewares.ProvideUserID)
 		r.Post("/", orderHandler.Create)
 		r.Get("/", orderHandler.GetAll)
 		r.Get("/mine", orderHandler.GetByUserID)

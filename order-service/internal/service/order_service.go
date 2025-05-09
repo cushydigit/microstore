@@ -32,7 +32,7 @@ func (s *OrderService) Create(userID int, items []types.OrderItem) (*types.Order
 
 	totalPrice := 0.0
 	for _, item := range items {
-		resp, err := http.Get(fmt.Sprintf("%s/%d", productEndpoint, item.ProductID))
+		resp, err := http.Get(fmt.Sprintf("%s/product/%d", productEndpoint, item.ProductID))
 		if err != nil || resp.StatusCode != http.StatusOK {
 			return nil, fmt.Errorf("failed to fetch product %d", item.ProductID)
 		}

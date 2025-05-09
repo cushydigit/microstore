@@ -22,7 +22,7 @@ func (r *PostgresOrderRepository) Create(order *types.Order) error {
 
 	// Insert order
 	err = tx.QueryRow(`
-		INSERT INTO ordres (user_id, total_price, status)
+		INSERT INTO orders (user_id, total_price, status)
 		VALUES ($1, $2, $3)
 		RETURNING id
 	`, order.UserID, order.TotalPrice, order.Status).Scan(&order.ID)
@@ -35,7 +35,7 @@ func (r *PostgresOrderRepository) Create(order *types.Order) error {
 	for _, item := range order.Items {
 		_, err := tx.Exec(`
 			INSERT INTO order_items (order_id, product_id, quantity)
-			VALUES ($1, 2$, 3$)
+			VALUES ($1, $2, $3)
 		`, order.ID, item.ProductID, item.Quantity)
 		if err != nil {
 			tx.Rollback()
