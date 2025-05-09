@@ -20,16 +20,16 @@ func NewOrderHandler(orderService *service.OrderService) *OrderHandler {
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req types.CreateOrderRequest
-	if err := helpers.ReadJSON(w, r, &req); err != nil {
-		helpers.ErrorJSON(w, errors.New("Invalid request"))
+	req, ok := r.Context().Value(types.CreateOrderRequestKey).(types.CreateOrderRequest)
+	if !ok {
+		helpers.ErrorJSON(w, errors.New("create order req not found in context"), http.StatusInternalServerError)
 		return
 	}
 
 	// get user ID from context
-	userID, ok := r.Context().Value("user_id").(int)
+	userID, ok := r.Context().Value(types.UserIDKey).(int)
 	if !ok {
-		helpers.ErrorJSON(w, errors.New("the user id not specified"), http.StatusInternalServerError)
+		helpers.ErrorJSON(w, errors.New("the user id not found in context"), http.StatusInternalServerError)
 		return
 	}
 	order, err := h.OrderService.Create(userID, req.Items)
@@ -75,7 +75,11 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 func (h *OrderHandler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 
 	// get user ID from context
-	userID := r.Context().Value("user_id").(int)
+	userID, ok := r.Context().Value(types.UserIDKey).(int)
+	if !ok {
+		helpers.ErrorJSON(w, errors.New("the user id not found in context"), http.StatusInternalServerError)
+		return
+	}
 	orders, err := h.OrderService.GetAllByUserID(userID)
 	if err != nil {
 		helpers.ErrorJSON(w, err)

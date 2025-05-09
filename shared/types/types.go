@@ -1,6 +1,32 @@
 package types
 
-import "time"
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
+
+type JWTClaims struct {
+	UserID int    `json:"user_id"`
+	Email  string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+type HeaderKey string
+
+const (
+	XUserID    HeaderKey = "X-User-ID"
+	XUserEmail HeaderKey = "X-Email-ID"
+)
+
+type ContextKey string
+
+const (
+	UserIDKey             ContextKey = "user_id"
+	UserEmailKey          ContextKey = "user_email"
+	ProductKey            ContextKey = "validated_product"
+	CreateOrderRequestKey ContextKey = "validated_create_order_requeset"
+)
 
 type AuthRequest struct {
 	Email    string `json:"email"`

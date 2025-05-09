@@ -26,9 +26,6 @@ func NewOrderService(repo repository.OrderRepository, productAPIURL string) *Ord
 }
 
 func (s *OrderService) Create(userID int, items []types.OrderItem) (*types.Order, error) {
-	if len(items) == 0 {
-		return nil, errors.New("no items provided")
-	}
 
 	totalPrice := 0.0
 	for _, item := range items {

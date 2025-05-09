@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cushydigit/microstore/shared/helpers"
+	"github.com/cushydigit/microstore/shared/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -28,7 +29,8 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
+		claims := &types.JWTClaims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 			return jwtSecret, nil
 		})
 
@@ -37,37 +39,33 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || claims["user_id"] == nil {
-			helpers.ErrorJSON(w, errors.New("Invalid token claims"), http.StatusUnauthorized)
-			return
-		}
+		// inject into header for downstream services
+		r.Header.Set(string(types.XUserID), strconv.Itoa(claims.UserID))
+		r.Header.Set(string(types.XUserEmail), claims.Email)
 
-		userID := int(claims["user_id"].(float64))
+		// inject into context for internal use
+		ctx := context.WithValue(r.Context(), types.UserIDKey, claims.UserID)
+		ctx = context.WithValue(ctx, types.UserEmailKey, claims.Email)
 
-		// Inject int o header fo downstream services
-		r.Header.Set("X-User-ID", strconv.Itoa(userID))
-
-		// Inject into context in the case of future use
-		ctx := context.WithValue(r.Context(), "user_id", userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 func RequireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userIDVal := r.Context().Value("user_id")
-		userID, ok := userIDVal.(int)
-		if !ok || userID != 1 {
+		emailVal := r.Context().Value(types.UserEmailKey)
+		email, ok := emailVal.(string)
+		if !ok || !strings.HasSuffix(email, "@admin.microstore.com") {
 			helpers.ErrorJSON(w, errors.New("Require admin privilege"), http.StatusForbidden)
 			return
 		}
+
 		next.ServeHTTP(w, r)
 	})
 }
 
 func ProvideUserID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userIDStr := r.Header.Get("X-User-ID")
+		userIDStr := r.Header.Get(string(types.XUserID))
 		if userIDStr == "" {
 			helpers.ErrorJSON(w, errors.New("User ID header missing"), http.StatusUnauthorized)
 			return
@@ -77,7 +75,7 @@ func ProvideUserID(next http.Handler) http.Handler {
 			helpers.ErrorJSON(w, errors.New("Invalid user ID format"), http.StatusUnauthorized)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "user_id", userID)
+		ctx := context.WithValue(r.Context(), types.UserIDKey, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

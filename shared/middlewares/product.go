@@ -24,7 +24,7 @@ func ValidateCreateProduct(next http.Handler) http.Handler {
 		}
 
 		// inject validated product into context
-		ctx := context.WithValue(r.Context(), "validated_product", product)
+		ctx := context.WithValue(r.Context(), types.ProductKey, product)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

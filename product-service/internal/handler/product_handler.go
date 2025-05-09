@@ -23,7 +23,7 @@ func NewProductHandler(s *service.ProductService) *ProductHandler {
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
-	p, ok := r.Context().Value("validated_product").(types.Product)
+	p, ok := r.Context().Value(types.ProductKey).(types.Product)
 	if !ok {
 		helpers.ErrorJSON(w, errors.New("product not found in context"), http.StatusInternalServerError)
 		return
