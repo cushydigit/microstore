@@ -40,6 +40,7 @@ func main() {
 	// routes
 	r.Route("/product", func(r chi.Router) {
 		r.Post("/", productHandler.Create)
+		r.Post("/bulk", productHandler.CreateBulk)
 		r.Get("/", productHandler.GetAll)
 		r.Get("/{id}", productHandler.GetByID)
 		r.Delete("/{id}", productHandler.Delete)

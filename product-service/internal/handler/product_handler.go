@@ -43,6 +43,27 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	helpers.WriteJSON(w, http.StatusCreated, payload)
 }
 
+func (h *ProductHandler) CreateBulk(w http.ResponseWriter, r *http.Request) {
+	var ps []types.Product
+	if err := helpers.ReadJSON(w, r, &ps); err != nil {
+		helpers.ErrorJSON(w, errors.New("Invalid request"))
+		return
+	}
+
+	if err := h.ProductService.CreateBulk(ps); err != nil {
+		helpers.ErrorJSON(w, errors.New("failed to create products"), http.StatusInternalServerError)
+		return
+	}
+
+	payload := types.Response{
+		Error:   false,
+		Message: "Bulk products created",
+		Data:    nil,
+	}
+
+	helpers.WriteJSON(w, http.StatusCreated, payload)
+}
+
 func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	products, err := h.ProductService.GetAll()
 	if err != nil {

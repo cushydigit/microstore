@@ -25,6 +25,33 @@ func (r *PostgresProductRepo) Create(p *types.Product) error {
 	).Scan(&p.ID)
 }
 
+func (r *PostgresProductRepo) CreateBulk(ps []types.Product) error {
+	query := `INSERT INTO products (name, description, price, stock ) VALUES ($1, $2, $3, $4)`
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return err
+	}
+	// not strictly needed, just pre-compiled and SQL statement allowing to be executed multiple time efficiently
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	for _, p := range ps {
+		if _, err := stmt.Exec(p.Name, p.Description, p.Price, p.Stock); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *PostgresProductRepo) GetAll() ([]types.Product, error) {
 	rows, err := r.DB.Query(`SELECT id, name, description, price, stock FROM products`)
 	if err != nil {

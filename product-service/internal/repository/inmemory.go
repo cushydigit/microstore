@@ -44,6 +44,18 @@ func (r *InMemoryProductRepo) Create(p *types.Product) error {
 	return nil
 }
 
+func (r *InMemoryProductRepo) CreateBulk(ps []types.Product) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	for _, p := range ps {
+		p.ID = r.nextID
+		r.products[p.ID] = &p
+		r.nextID++
+	}
+	return nil
+}
+
 func (r *InMemoryProductRepo) GetAll() ([]types.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

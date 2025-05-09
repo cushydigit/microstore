@@ -22,6 +22,7 @@ func setupRouter() http.Handler {
 
 	r := chi.NewRouter()
 	r.Post("/product", h.Create)
+	r.Post("/product/bulk", h.Create)
 	r.Get("/product", h.GetAll)
 	r.Get("/product/{id}", h.GetByID)
 	r.Delete("/product/{id}", h.Delete)

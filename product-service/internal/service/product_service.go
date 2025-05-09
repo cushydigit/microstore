@@ -17,6 +17,10 @@ func (s *ProductService) Create(p *types.Product) error {
 	return s.Repo.Create(p)
 }
 
+func (s *ProductService) CreateBulk(ps []types.Product) error {
+	return s.Repo.CreateBulk(ps)
+}
+
 func (s *ProductService) GetAll() ([]types.Product, error) {
 	return s.Repo.GetAll()
 }
