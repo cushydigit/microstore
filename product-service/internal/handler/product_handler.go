@@ -23,9 +23,9 @@ func NewProductHandler(s *service.ProductService) *ProductHandler {
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var p types.Product
-	if err := helpers.ReadJSON(w, r, &p); err != nil {
-		helpers.ErrorJSON(w, errors.New("Invalid request"))
+	p, ok := r.Context().Value("validated_product").(types.Product)
+	if !ok {
+		helpers.ErrorJSON(w, errors.New("product not found in context"), http.StatusInternalServerError)
 		return
 	}
 

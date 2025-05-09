@@ -10,6 +10,7 @@ import (
 	"github.com/cushydigit/microstore/product-service/internal/repository"
 	"github.com/cushydigit/microstore/product-service/internal/service"
 	"github.com/cushydigit/microstore/shared/database"
+	"github.com/cushydigit/microstore/shared/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -39,7 +40,7 @@ func main() {
 
 	// routes
 	r.Route("/product", func(r chi.Router) {
-		r.Post("/", productHandler.Create)
+		r.With(middlewares.ValidateCreateProduct).Post("/", productHandler.Create)
 		r.Post("/bulk", productHandler.CreateBulk)
 		r.Get("/", productHandler.GetAll)
 		r.Get("/{id}", productHandler.GetByID)
