@@ -1,4 +1,4 @@
-package main
+package middlewares
 
 import (
 	"context"
@@ -9,13 +9,12 @@ import (
 	"strings"
 
 	"github.com/cushydigit/microstore/shared/helpers"
-
 	"github.com/golang-jwt/jwt/v5"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -54,15 +53,31 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-
-func AdminMiddleware(next http.Handler) http.Handler {
+func RequireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userIDVal := r.Context().Value("user_id")
 		userID, ok := userIDVal.(int)
 		if !ok || userID != 1 {
-			helpers.ErrorJSON(w, errors.New("Require admin privilate"), http.StatusForbidden)
+			helpers.ErrorJSON(w, errors.New("Require admin privilege"), http.StatusForbidden)
 			return
 		}
 		next.ServeHTTP(w, r)
+	})
+}
+
+func ProvideUserID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userIDStr := r.Header.Get("X-User-ID")
+		if userIDStr == "" {
+			helpers.ErrorJSON(w, errors.New("User ID header missing"), http.StatusUnauthorized)
+			return
+		}
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			helpers.ErrorJSON(w, errors.New("Invalid user ID format"), http.StatusUnauthorized)
+			return
+		}
+		ctx := context.WithValue(r.Context(), "user_id", userID)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

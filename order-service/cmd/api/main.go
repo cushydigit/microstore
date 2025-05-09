@@ -10,6 +10,7 @@ import (
 	"github.com/cushydigit/microstore/order-service/internal/repository"
 	"github.com/cushydigit/microstore/order-service/internal/service"
 	"github.com/cushydigit/microstore/shared/database"
+	"github.com/cushydigit/microstore/shared/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -36,6 +37,7 @@ func main() {
 
 	// routes
 	r.Route("/order", func(r chi.Router) {
+		r.With(middlewares.ProvideUserID)
 		r.Post("/", orderHandler.Create)
 		r.Get("/", orderHandler.GetAll)
 		r.Get("/mine", orderHandler.GetByUserID)

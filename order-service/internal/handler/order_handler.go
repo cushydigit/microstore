@@ -27,7 +27,11 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get user ID from context
-	userID := r.Context().Value("user_id").(int)
+	userID, ok := r.Context().Value("user_id").(int)
+	if !ok {
+		helpers.ErrorJSON(w, errors.New("the user id not specified"), http.StatusInternalServerError)
+		return
+	}
 	order, err := h.OrderService.Create(userID, req.Items)
 	if err != nil {
 		helpers.ErrorJSON(w, err)

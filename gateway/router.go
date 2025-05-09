@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/cushydigit/microstore/shared/middlewares"
 	"github.com/cushydigit/microstore/shared/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -50,19 +51,19 @@ func Routes() http.Handler {
 		// public
 		r.Get("/*", utils.ProxyHandler(productEndpoint))
 
-		// private
-		r.With(AuthMiddleware, AdminMiddleware).Post("/*", utils.ProxyHandler(productEndpoint))
-		r.With(AuthMiddleware, AdminMiddleware).Delete("/*", utils.ProxyHandler(productEndpoint))
+		// private admin only
+		r.With(middlewares.RequireAuth, middlewares.RequireAdmin).Post("/*", utils.ProxyHandler(productEndpoint))
+		r.With(middlewares.RequireAuth, middlewares.RequireAdmin).Delete("/*", utils.ProxyHandler(productEndpoint))
 	})
 
 	// order service
 	r.Route("/order", func(r chi.Router) {
-		// private admin route
-		r.With(AuthMiddleware, AdminMiddleware).Get("/", utils.ProxyHandler(orderEndpoint))
-		// private user route
-		r.With(AuthMiddleware).Post("/", utils.ProxyHandler(orderEndpoint))
-		r.With(AuthMiddleware).Get("/mine", utils.ProxyHandler(orderEndpoint))
-		r.With(AuthMiddleware).Get("/{id}", utils.ProxyHandler(orderEndpoint))
+		// private admin only
+		r.With(middlewares.RequireAuth, middlewares.RequireAdmin).Get("/", utils.ProxyHandler(orderEndpoint))
+		// private user
+		r.With(middlewares.RequireAuth).Post("/", utils.ProxyHandler(orderEndpoint))
+		r.With(middlewares.RequireAuth).Get("/mine", utils.ProxyHandler(orderEndpoint))
+		r.With(middlewares.RequireAuth).Get("/{id}", utils.ProxyHandler(orderEndpoint))
 	})
 
 	return r
