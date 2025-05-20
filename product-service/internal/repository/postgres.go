@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	myredis "github.com/cushydigit/microstore/shared/redis"
 	"github.com/cushydigit/microstore/shared/types"
 )
 
@@ -84,6 +85,26 @@ func (r *PostgresProductRepo) GetByID(id int64) (*types.Product, error) {
 	}
 
 	return &p, nil
+}
+
+func (r *PostgresProductRepo) GetByIDWithCache(id int64) (*types.Product, bool, error) {
+
+	// Try cache
+	product, cashed, err := myredis.GetProductFromCache(id)
+	if cashed {
+		return product, true, nil
+	}
+
+	// Fallback to DB
+	product, err = r.GetByID(id)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// Cache it
+	myredis.SetProductToCache(product)
+
+	return product, false, nil
 }
 
 func (r *PostgresProductRepo) Delete(id int64) error {

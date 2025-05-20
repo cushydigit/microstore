@@ -33,6 +33,18 @@ func (r *InMemoryProductRepo) GetByID(id int64) (*types.Product, error) {
 	return product, nil
 }
 
+func (r *InMemoryProductRepo) GetByIDWithCache(id int64) (*types.Product, bool, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	product, ok := r.products[id]
+	if !ok {
+		return nil, false, nil
+	}
+
+	return product, true, nil
+}
+
 func (r *InMemoryProductRepo) Create(p *types.Product) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()

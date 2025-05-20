@@ -18,7 +18,7 @@ const (
 func RateLimiter(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := getIP(r)
-		key := "rl:" + ip
+		key := myredis.RateLimiterKey(ip)
 
 		count, err := myredis.Client.Incr(myredis.Ctx, key).Result()
 		if err != nil {

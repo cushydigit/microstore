@@ -87,7 +87,7 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := h.ProductService.GetByID(id)
+	p, cached, err := h.ProductService.GetByIDWithCache(id)
 	if err != nil {
 		helpers.ErrorJSON(w, errors.New("error fetching product"), http.StatusInternalServerError)
 		return
@@ -95,6 +95,13 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	if p == nil {
 		helpers.ErrorJSON(w, errors.New("product not found"), http.StatusNotFound)
+		return
+	}
+
+	if cached {
+		w.Header().Set("X-Cashe", "HIT")
+	} else {
+		w.Header().Set("X-Cashe", "MISS")
 	}
 
 	payload := types.ProductResponse{

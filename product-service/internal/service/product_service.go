@@ -29,6 +29,10 @@ func (s *ProductService) GetByID(id int64) (*types.Product, error) {
 	return s.Repo.GetByID(id)
 }
 
+func (s *ProductService) GetByIDWithCache(id int64) (*types.Product, bool, error) {
+	return s.Repo.GetByIDWithCache(id)
+}
+
 func (s *ProductService) Delete(id int64) error {
 	return s.Repo.Delete(id)
 }
