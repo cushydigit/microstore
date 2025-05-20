@@ -20,14 +20,14 @@ func RateLimiter(next http.Handler) http.Handler {
 		ip := getIP(r)
 		key := myredis.RateLimiterKey(ip)
 
-		count, err := myredis.Client.Incr(myredis.Ctx, key).Result()
+		count, err := myredis.Client.Incr(r.Context(), key).Result()
 		if err != nil {
 			helpers.ErrorJSON(w, errors.New("Resis error"), http.StatusInternalServerError)
 			return
 		}
 
 		if count == 1 {
-			myredis.Client.Expire(myredis.Ctx, key, time.Duration(WindowSec)*time.Second)
+			myredis.Client.Expire(r.Context(), key, time.Duration(WindowSec)*time.Second)
 		}
 
 		if count > Limit {

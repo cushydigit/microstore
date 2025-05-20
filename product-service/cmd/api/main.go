@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,7 +26,7 @@ var (
 
 func main() {
 	// init redis
-	myredis.Init(redisAddr)
+	myredis.Init(context.Background(), redisAddr)
 
 	// get dsn
 	if dsn == "" {

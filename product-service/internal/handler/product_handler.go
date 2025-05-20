@@ -29,7 +29,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.ProductService.Create(&p); err != nil {
+	if err := h.ProductService.Create(r.Context(), &p); err != nil {
 		log.Printf("error: %v", err)
 		helpers.ErrorJSON(w, errors.New("failed to create product"), http.StatusInternalServerError)
 		return
@@ -50,7 +50,7 @@ func (h *ProductHandler) CreateBulk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.ProductService.CreateBulk(ps); err != nil {
+	if err := h.ProductService.CreateBulk(r.Context(), ps); err != nil {
 		helpers.ErrorJSON(w, errors.New("failed to create products"), http.StatusInternalServerError)
 		return
 	}
@@ -65,7 +65,7 @@ func (h *ProductHandler) CreateBulk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	products, err := h.ProductService.GetAll()
+	products, err := h.ProductService.GetAll(r.Context())
 	if err != nil {
 		helpers.ErrorJSON(w, errors.New("failed to fetch products"), http.StatusInternalServerError)
 		return
@@ -87,7 +87,7 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, cached, err := h.ProductService.GetByIDWithCache(id)
+	p, cached, err := h.ProductService.GetByID(r.Context(), id)
 	if err != nil {
 		helpers.ErrorJSON(w, errors.New("error fetching product"), http.StatusInternalServerError)
 		return
@@ -99,9 +99,9 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if cached {
-		w.Header().Set("X-Cashe", "HIT")
+		w.Header().Set("X-Cache", "HIT")
 	} else {
-		w.Header().Set("X-Cashe", "MISS")
+		w.Header().Set("X-Cache", "MISS")
 	}
 
 	payload := types.ProductResponse{
@@ -120,7 +120,7 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.ProductService.Delete(id); err != nil {
+	if err := h.ProductService.Delete(r.Context(), id); err != nil {
 		helpers.ErrorJSON(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}

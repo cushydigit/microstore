@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ var (
 
 func main() {
 
-	myredis.Init(redisAddr)
+	myredis.Init(context.Background(), redisAddr)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
