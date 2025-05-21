@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"sync"
 
@@ -21,7 +22,7 @@ func NewInMemoryProductRepo() ProductRepository {
 
 }
 
-func (r *InMemoryProductRepo) GetByID(id int64) (*types.Product, error) {
+func (r *InMemoryProductRepo) GetByID(ctx context.Context, id int64) (*types.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -33,7 +34,7 @@ func (r *InMemoryProductRepo) GetByID(id int64) (*types.Product, error) {
 	return product, nil
 }
 
-func (r *InMemoryProductRepo) Create(p *types.Product) error {
+func (r *InMemoryProductRepo) Create(ctx context.Context, p *types.Product) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -44,7 +45,7 @@ func (r *InMemoryProductRepo) Create(p *types.Product) error {
 	return nil
 }
 
-func (r *InMemoryProductRepo) CreateBulk(ps []types.Product) error {
+func (r *InMemoryProductRepo) CreateBulk(ctx context.Context, ps []types.Product) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -56,7 +57,7 @@ func (r *InMemoryProductRepo) CreateBulk(ps []types.Product) error {
 	return nil
 }
 
-func (r *InMemoryProductRepo) GetAll() ([]types.Product, error) {
+func (r *InMemoryProductRepo) GetAll(ctx context.Context) ([]types.Product, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -68,7 +69,7 @@ func (r *InMemoryProductRepo) GetAll() ([]types.Product, error) {
 	return products, nil
 }
 
-func (r *InMemoryProductRepo) Delete(id int64) error {
+func (r *InMemoryProductRepo) Delete(ctx context.Context, id int64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

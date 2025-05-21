@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/cushydigit/microstore/product-service/internal/repository"
@@ -10,6 +11,7 @@ import (
 )
 
 func TestProductService(t *testing.T) {
+	ctx := context.Background()
 	repo := repository.NewInMemoryProductRepo()
 	svc := service.NewProductService(repo)
 
@@ -20,26 +22,26 @@ func TestProductService(t *testing.T) {
 	}
 
 	// test empty projects
-	ps, err := svc.GetAll()
+	ps, err := svc.GetAll(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, len(ps), 0)
 
 	// test create
-	err = svc.Create(p)
+	err = svc.Create(ctx, p)
 	assert.NoError(t, err)
 
 	// test get by id
-	got, err := svc.GetByID(int64(1))
+	got, _, err := svc.GetByID(ctx, int64(1))
 	assert.NoError(t, err)
 	assert.Equal(t, got.Name, p.Name)
 	assert.Equal(t, got.ID, int64(1))
 
 	// test delete
-	err = svc.Delete(got.ID)
+	err = svc.Delete(ctx, got.ID)
 	assert.NoError(t, err)
 
 	// test after delete
-	got, err = svc.GetByID(got.ID)
+	got, _, err = svc.GetByID(ctx, got.ID)
 	assert.NoError(t, err)
 	assert.Nil(t, got)
 

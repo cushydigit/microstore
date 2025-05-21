@@ -1,21 +1,13 @@
 package main
 
 import (
-	"net/http"
-	"os"
-
 	"github.com/cushydigit/microstore/shared/middlewares"
 	"github.com/cushydigit/microstore/shared/utils"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-)
-
-var (
-	authEndpoint    = os.Getenv("AUTH_API_URL")
-	productEndpoint = os.Getenv("PRODUCT_API_URL")
-	orderEndpoint   = os.Getenv("ORDER_API_URL")
 )
 
 func Routes() http.Handler {
@@ -24,6 +16,7 @@ func Routes() http.Handler {
 	// Middlewares
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(middlewares.RateLimiter)
 
 	// specify who is allowed to connect
 	r.Use(cors.Handler(cors.Options{

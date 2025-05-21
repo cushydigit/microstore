@@ -1,11 +1,15 @@
 package repository
 
-import "github.com/cushydigit/microstore/shared/types"
+import (
+	"context"
+
+	"github.com/cushydigit/microstore/shared/types"
+)
 
 type ProductRepository interface {
-	GetByID(id int64) (*types.Product, error)
-	Create(product *types.Product) error
-	CreateBulk(product []types.Product) error
-	GetAll() ([]types.Product, error)
-	Delete(id int64) error
+	GetByID(ctx context.Context, id int64) (*types.Product, error)
+	Create(ctx context.Context, product *types.Product) error
+	CreateBulk(ctx context.Context, product []types.Product) error
+	GetAll(ctx context.Context) ([]types.Product, error)
+	Delete(ctx context.Context, id int64) error
 }

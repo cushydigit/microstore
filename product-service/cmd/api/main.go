@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,18 +12,26 @@ import (
 	"github.com/cushydigit/microstore/product-service/internal/service"
 	"github.com/cushydigit/microstore/shared/database"
 	"github.com/cushydigit/microstore/shared/middlewares"
+	myredis "github.com/cushydigit/microstore/shared/redis"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+var (
+	dsn       = os.Getenv("DSN")
+	port      = os.Getenv("PORT")
+	redisAddr = os.Getenv("REDIS_ADDR")
+)
+
 func main() {
+	// init redis
+	myredis.Init(context.Background(), redisAddr)
+
 	// get dsn
-	dsn := os.Getenv("DSN")
 	if dsn == "" {
 		log.Panic("DSN not set")
 	}
-
 	// connect to db
 	db := database.ConnectDB(dsn)
 
@@ -46,8 +55,6 @@ func main() {
 		r.Get("/{id}", productHandler.GetByID)
 		r.Delete("/{id}", productHandler.Delete)
 	})
-
-	port := os.Getenv("PORT")
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),

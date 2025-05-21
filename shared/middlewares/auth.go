@@ -30,7 +30,7 @@ func RequireAuth(next http.Handler) http.Handler {
 		}
 
 		claims := &types.JWTClaims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
 			return jwtSecret, nil
 		})
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -15,7 +16,7 @@ func NewPostgresProductRepo(db *sql.DB) *PostgresProductRepo {
 	return &PostgresProductRepo{DB: db}
 }
 
-func (r *PostgresProductRepo) Create(p *types.Product) error {
+func (r *PostgresProductRepo) Create(ctx context.Context, p *types.Product) error {
 	return r.DB.QueryRow(
 		`INSERT INTO products (name, description, price, stock) VALUES ($1, $2, $3, $4) RETURNING id`,
 		p.Name,
@@ -25,7 +26,7 @@ func (r *PostgresProductRepo) Create(p *types.Product) error {
 	).Scan(&p.ID)
 }
 
-func (r *PostgresProductRepo) CreateBulk(ps []types.Product) error {
+func (r *PostgresProductRepo) CreateBulk(ctx context.Context, ps []types.Product) error {
 	query := `INSERT INTO products (name, description, price, stock ) VALUES ($1, $2, $3, $4)`
 	tx, err := r.DB.Begin()
 	if err != nil {
@@ -52,7 +53,7 @@ func (r *PostgresProductRepo) CreateBulk(ps []types.Product) error {
 	return nil
 }
 
-func (r *PostgresProductRepo) GetAll() ([]types.Product, error) {
+func (r *PostgresProductRepo) GetAll(ctx context.Context) ([]types.Product, error) {
 	rows, err := r.DB.Query(`SELECT id, name, description, price, stock FROM products`)
 	if err != nil {
 		return nil, err
@@ -70,7 +71,7 @@ func (r *PostgresProductRepo) GetAll() ([]types.Product, error) {
 	return products, nil
 }
 
-func (r *PostgresProductRepo) GetByID(id int64) (*types.Product, error) {
+func (r *PostgresProductRepo) GetByID(ctx context.Context, id int64) (*types.Product, error) {
 	var p types.Product
 	err := r.DB.QueryRow(`SELECT id, name, description, price, stock FROM products WHERE id = $1`, id).Scan(
 		&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock,
@@ -86,7 +87,7 @@ func (r *PostgresProductRepo) GetByID(id int64) (*types.Product, error) {
 	return &p, nil
 }
 
-func (r *PostgresProductRepo) Delete(id int64) error {
+func (r *PostgresProductRepo) Delete(ctx context.Context, id int64) error {
 	result, err := r.DB.Exec(`DELETE FROM products WHERE id = $1`, id)
 	if err != nil {
 		return err
