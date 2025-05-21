@@ -13,20 +13,26 @@ import (
 	"github.com/cushydigit/microstore/shared/database"
 	"github.com/cushydigit/microstore/shared/middlewares"
 	myredis "github.com/cushydigit/microstore/shared/redis"
+	"github.com/cushydigit/microstore/shared/zincsearch"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 var (
-	dsn       = os.Getenv("DSN")
-	port      = os.Getenv("PORT")
-	redisAddr = os.Getenv("REDIS_ADDR")
+	dsn                = os.Getenv("DSN")
+	port               = os.Getenv("PORT")
+	redisAddr          = os.Getenv("REDIS_ADDR")
+	zincsearchAddr     = os.Getenv("ZINCSEARCH_ADDR")
+	zincsearchUsername = os.Getenv("ZINCSEARCH_USERNAME")
+	zincsearchPassword = os.Getenv("ZINCSEARCH_PASSWORD")
 )
 
 func main() {
 	// init redis
 	myredis.Init(context.Background(), redisAddr)
+
+	zincsearch.Init(zincsearchAddr, zincsearchUsername, zincsearchPassword)
 
 	// get dsn
 	if dsn == "" {
