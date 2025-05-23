@@ -132,3 +132,31 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 	helpers.WriteJSON(w, http.StatusOK, payload)
 }
+
+func (h *ProductHandler) Search(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		helpers.ErrorJSON(w, errors.New("missing query paramater ?q="))
+		return
+	}
+
+	results, err := h.ProductService.Search(r.Context(), query)
+	if err != nil {
+		helpers.ErrorJSON(w, fmt.Errorf("failed search product: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	payload := types.Response{
+		Error: false,
+	}
+
+	if len(results) == 0 {
+		payload.Message = "There is no result for search query"
+		payload.Data = []types.Product{}
+	} else {
+		payload.Message = fmt.Sprintf("total products found with searh query: %d", len(results))
+		payload.Data = results
+	}
+
+	helpers.WriteJSON(w, http.StatusOK, payload)
+}

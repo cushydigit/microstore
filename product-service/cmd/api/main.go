@@ -32,7 +32,7 @@ func main() {
 	// init redis
 	myredis.Init(context.Background(), redisAddr)
 
-	zincsearch.Init(zincsearchAddr, zincsearchUsername, zincsearchPassword)
+	indexer := zincsearch.Init(zincsearchAddr, zincsearchUsername, zincsearchPassword, "products")
 
 	// get dsn
 	if dsn == "" {
@@ -44,7 +44,7 @@ func main() {
 	// TEMP: in-memory product storage
 	// repo := repository.NewInMemoryProductRepo()
 	repo := repository.NewPostgresProductRepo(db)
-	productService := service.NewProductService(repo)
+	productService := service.NewProductService(repo, indexer)
 	productHandler := handler.NewProductHandler(productService)
 
 	r := chi.NewRouter()
@@ -58,6 +58,7 @@ func main() {
 		r.With(middlewares.ValidateCreateProduct).Post("/", productHandler.Create)
 		r.Post("/bulk", productHandler.CreateBulk)
 		r.Get("/", productHandler.GetAll)
+		r.Get("/search", productHandler.Search)
 		r.Get("/{id}", productHandler.GetByID)
 		r.Delete("/{id}", productHandler.Delete)
 	})

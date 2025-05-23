@@ -26,6 +26,7 @@ func (r *PostgresProductRepo) Create(ctx context.Context, p *types.Product) erro
 	).Scan(&p.ID)
 }
 
+// TODO change the ps types to []*types.Product to include ID for indexing at service layer
 func (r *PostgresProductRepo) CreateBulk(ctx context.Context, ps []types.Product) error {
 	query := `INSERT INTO products (name, description, price, stock ) VALUES ($1, $2, $3, $4)`
 	tx, err := r.DB.Begin()

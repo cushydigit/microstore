@@ -83,19 +83,21 @@ services:
 
   redis:
     image: docker.arvancloud.ir/redis:alpine
+    container_name: redis
     restart: always
     ports:
       - 6379:6379
 
   zincsearch:
     image: public.ecr.aws/zinclabs/zincsearch:latest
+    container_name: zincsearch
     environment:
       ZINC_FIRST_ADMIN_USER: admin
       ZINC_FIRST_ADMIN_PASSWORD: password
     ports:
       - 4080:4080
     volumes:
-      - ./zinc-data:/usr/share/elasticsearch/data
+      - ./zinc-data:/data
 
   postgres:
     image: docker.arvancloud.ir/postgres:14.0
