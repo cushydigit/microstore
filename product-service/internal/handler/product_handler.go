@@ -44,7 +44,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductHandler) CreateBulk(w http.ResponseWriter, r *http.Request) {
-	var ps []types.Product
+	var ps []*types.Product
 	if err := helpers.ReadJSON(w, r, &ps); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
 		return
@@ -121,7 +121,7 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.ProductService.Delete(r.Context(), id); err != nil {
-		helpers.ErrorJSON(w, errors.New("product not found"), http.StatusNotFound)
+		helpers.ErrorJSON(w, err, http.StatusNotFound)
 		return
 	}
 
@@ -130,5 +130,47 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		Message: fmt.Sprintf("product with id %d deleted", id),
 		Data:    nil,
 	}
+	helpers.WriteJSON(w, http.StatusOK, payload)
+}
+
+func (h *ProductHandler) DeleteAll(w http.ResponseWriter, r *http.Request) {
+	if err := h.ProductService.DeleteAll(r.Context()); err != nil {
+		helpers.ErrorJSON(w, err, http.StatusNotFound)
+		return
+	}
+	payload := types.Response{
+		Error:   false,
+		Message: "many products deleted from DB",
+		Data:    nil,
+	}
+
+	helpers.WriteJSON(w, http.StatusOK, payload)
+}
+
+func (h *ProductHandler) Search(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		helpers.ErrorJSON(w, errors.New("missing query paramater ?q="))
+		return
+	}
+
+	results, err := h.ProductService.Search(r.Context(), query)
+	if err != nil {
+		helpers.ErrorJSON(w, fmt.Errorf("failed search product: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	payload := types.Response{
+		Error: false,
+	}
+
+	if len(results) == 0 {
+		payload.Message = "There is no result for search query"
+		payload.Data = []types.Product{}
+	} else {
+		payload.Message = fmt.Sprintf("total products found with searh query: %d", len(results))
+		payload.Data = results
+	}
+
 	helpers.WriteJSON(w, http.StatusOK, payload)
 }

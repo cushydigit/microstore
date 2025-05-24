@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Limit     = 5
+	Limit     = 30
 	WindowSec = 60
 )
 

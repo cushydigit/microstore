@@ -13,20 +13,26 @@ import (
 	"github.com/cushydigit/microstore/shared/database"
 	"github.com/cushydigit/microstore/shared/middlewares"
 	myredis "github.com/cushydigit/microstore/shared/redis"
+	"github.com/cushydigit/microstore/shared/zincsearch"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 var (
-	dsn       = os.Getenv("DSN")
-	port      = os.Getenv("PORT")
-	redisAddr = os.Getenv("REDIS_ADDR")
+	dsn                = os.Getenv("DSN")
+	port               = os.Getenv("PORT")
+	redisAddr          = os.Getenv("REDIS_ADDR")
+	zincsearchAddr     = os.Getenv("ZINCSEARCH_ADDR")
+	zincsearchUsername = os.Getenv("ZINCSEARCH_USERNAME")
+	zincsearchPassword = os.Getenv("ZINCSEARCH_PASSWORD")
 )
 
 func main() {
 	// init redis
 	myredis.Init(context.Background(), redisAddr)
+
+	indexer := zincsearch.Init(zincsearchAddr, zincsearchUsername, zincsearchPassword, "products")
 
 	// get dsn
 	if dsn == "" {
@@ -38,7 +44,7 @@ func main() {
 	// TEMP: in-memory product storage
 	// repo := repository.NewInMemoryProductRepo()
 	repo := repository.NewPostgresProductRepo(db)
-	productService := service.NewProductService(repo)
+	productService := service.NewProductService(repo, indexer)
 	productHandler := handler.NewProductHandler(productService)
 
 	r := chi.NewRouter()
@@ -51,7 +57,9 @@ func main() {
 	r.Route("/product", func(r chi.Router) {
 		r.With(middlewares.ValidateCreateProduct).Post("/", productHandler.Create)
 		r.Post("/bulk", productHandler.CreateBulk)
+		r.Delete("/bulk", productHandler.DeleteAll)
 		r.Get("/", productHandler.GetAll)
+		r.Get("/search", productHandler.Search)
 		r.Get("/{id}", productHandler.GetByID)
 		r.Delete("/{id}", productHandler.Delete)
 	})

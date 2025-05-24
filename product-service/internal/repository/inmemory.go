@@ -45,13 +45,13 @@ func (r *InMemoryProductRepo) Create(ctx context.Context, p *types.Product) erro
 	return nil
 }
 
-func (r *InMemoryProductRepo) CreateBulk(ctx context.Context, ps []types.Product) error {
+func (r *InMemoryProductRepo) CreateBulk(ctx context.Context, ps []*types.Product) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	for _, p := range ps {
 		p.ID = r.nextID
-		r.products[p.ID] = &p
+		r.products[p.ID] = p
 		r.nextID++
 	}
 	return nil
@@ -79,5 +79,9 @@ func (r *InMemoryProductRepo) Delete(ctx context.Context, id int64) error {
 
 	delete(r.products, id)
 
+	return nil
+}
+
+func (r *InMemoryProductRepo) DeleteAll(ctx context.Context) error {
 	return nil
 }
