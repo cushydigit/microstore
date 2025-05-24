@@ -12,4 +12,5 @@ type ProductRepository interface {
 	CreateBulk(ctx context.Context, product []types.Product) error
 	GetAll(ctx context.Context) ([]types.Product, error)
 	Delete(ctx context.Context, id int64) error
+	DeleteAll(ctx context.Context) error
 }

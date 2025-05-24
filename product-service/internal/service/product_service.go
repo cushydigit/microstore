@@ -86,6 +86,10 @@ func (s *ProductService) Delete(ctx context.Context, id int64) error {
 	return s.searchIndexer.DeleteProduct(ctx, "products", id)
 }
 
+func (s *ProductService) DeleteAll(ctx context.Context) error {
+	return s.Repo.DeleteAll(ctx)
+}
+
 func (s *ProductService) Search(ctx context.Context, query string) ([]*types.Product, error) {
 	return s.searchIndexer.SearchProduct(ctx, query)
 }

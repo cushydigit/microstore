@@ -100,3 +100,16 @@ func (r *PostgresProductRepo) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (r *PostgresProductRepo) DeleteAll(ctx context.Context) error {
+	result, err := r.DB.Exec(`DELETE FROM products`)
+	if err != nil {
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("there is no product found")
+	}
+
+	return nil
+}

@@ -57,6 +57,7 @@ func main() {
 	r.Route("/product", func(r chi.Router) {
 		r.With(middlewares.ValidateCreateProduct).Post("/", productHandler.Create)
 		r.Post("/bulk", productHandler.CreateBulk)
+		r.Delete("/bulk", productHandler.DeleteAll)
 		r.Get("/", productHandler.GetAll)
 		r.Get("/search", productHandler.Search)
 		r.Get("/{id}", productHandler.GetByID)

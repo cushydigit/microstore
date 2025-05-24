@@ -81,3 +81,7 @@ func (r *InMemoryProductRepo) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (r *InMemoryProductRepo) DeleteAll(ctx context.Context) error {
+	return nil
+}

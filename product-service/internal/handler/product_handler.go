@@ -121,7 +121,7 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.ProductService.Delete(r.Context(), id); err != nil {
-		helpers.ErrorJSON(w, errors.New("product not found"), http.StatusNotFound)
+		helpers.ErrorJSON(w, err, http.StatusNotFound)
 		return
 	}
 
@@ -130,6 +130,20 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		Message: fmt.Sprintf("product with id %d deleted", id),
 		Data:    nil,
 	}
+	helpers.WriteJSON(w, http.StatusOK, payload)
+}
+
+func (h *ProductHandler) DeleteAll(w http.ResponseWriter, r *http.Request) {
+	if err := h.ProductService.DeleteAll(r.Context()); err != nil {
+		helpers.ErrorJSON(w, err, http.StatusNotFound)
+		return
+	}
+	payload := types.Response{
+		Error:   false,
+		Message: "many products deleted from DB",
+		Data:    nil,
+	}
+
 	helpers.WriteJSON(w, http.StatusOK, payload)
 }
 
