@@ -15,12 +15,14 @@ import (
 type ProductService struct {
 	Repo          repository.ProductRepository
 	searchIndexer search.ProductIndexer
+	index         string
 }
 
 func NewProductService(repo repository.ProductRepository, searchIndexer search.ProductIndexer) *ProductService {
 	return &ProductService{
 		Repo:          repo,
 		searchIndexer: searchIndexer,
+		index:         "products",
 	}
 }
 
@@ -29,14 +31,14 @@ func (s *ProductService) Create(ctx context.Context, p *types.Product) error {
 		return err
 	}
 	// Index in zincsearch
-	return s.searchIndexer.IndexProduct(ctx, "products", p)
+	return s.searchIndexer.IndexProduct(ctx, s.index, p)
 }
 
 func (s *ProductService) CreateBulk(ctx context.Context, ps []*types.Product) error {
 	if err := s.Repo.CreateBulk(ctx, ps); err != nil {
 		return err
 	}
-	return s.searchIndexer.IndexBulkProduct(ctx, "products", ps)
+	return s.searchIndexer.IndexBulkProduct(ctx, s.index, ps)
 }
 
 func (s *ProductService) GetAll(ctx context.Context) ([]types.Product, error) {
@@ -86,13 +88,16 @@ func (s *ProductService) Delete(ctx context.Context, id int64) error {
 		log.Printf("failed to invalidate product cache: %v", err)
 	}
 	// Delete indexing
-	return s.searchIndexer.DeleteProduct(ctx, "products", id)
+	return s.searchIndexer.DeleteProduct(ctx, s.index, id)
 }
 
 func (s *ProductService) DeleteAll(ctx context.Context) error {
-	return s.Repo.DeleteAll(ctx)
+	if err := s.Repo.DeleteAll(ctx); err != nil {
+		return err
+	}
+	return s.searchIndexer.DeleteAllProducts(ctx, s.index)
 }
 
 func (s *ProductService) Search(ctx context.Context, query string) ([]*types.Product, error) {
-	return s.searchIndexer.SearchProduct(ctx, query)
+	return s.searchIndexer.SearchProduct(ctx, s.index, query)
 }

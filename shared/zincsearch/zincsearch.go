@@ -3,78 +3,23 @@ package zincsearch
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/cushydigit/microstore/shared/types"
 )
 
-type Client struct {
-	BaseUrl    string
-	Username   string
-	Password   string
-	HTTPClient *http.Client
-}
-
-var (
-	instance *Client
-	once     sync.Once
-)
-
-func Init(baseUrl, username, password, index string) *Client {
-	once.Do(func() {
-		instance = &Client{
-			BaseUrl:  baseUrl,
-			Username: username,
-			Password: password,
-			HTTPClient: &http.Client{
-				Timeout: 10 * time.Second,
-			},
-		}
-	})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// check the connection
-	if err := instance.healthCheck(ctx); err != nil {
-		log.Fatalf("failed to connect to zincsearch: %v", err)
-		return nil
-	}
-
-	// check if index is exists
-	ok, err := instance.indexExists(ctx, index)
-	if err != nil {
-		log.Fatalf("failed to check if index is exists: %v", err)
-		return nil
-	}
-
-	if !ok {
-		if err := instance.createIndex(ctx, index); err != nil {
-			log.Fatalf("failed to create not existed index : %v", err)
-			return nil
-		}
-	}
-
-	return instance
-}
-
-func GetInstance() *Client {
-	return instance
-}
-
 func (c *Client) healthCheck(ctx context.Context) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseUrl+"/", nil)
+	req, err := c.newRequest(ctx, http.MethodGet, "/", nil)
 	if err != nil {
 		return err
 	}
-	resp, err := c.HTTPClient.Do(req)
+
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -88,23 +33,13 @@ func (c *Client) healthCheck(ctx context.Context) error {
 }
 
 func (c *Client) IndexProduct(ctx context.Context, index string, product *types.Product) error {
-	url := fmt.Sprintf("%s/api/%s/_doc/%d", c.BaseUrl, index, product.ID)
-	log.Printf("url: %s", url)
-
-	data, err := json.Marshal(product)
+	url := fmt.Sprintf("/api/%s/_doc/%d", index, product.ID)
+	req, err := c.newRequest(ctx, http.MethodPut, url, product)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-
-	req.SetBasicAuth(c.Username, c.Password)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -118,26 +53,31 @@ func (c *Client) IndexProduct(ctx context.Context, index string, product *types.
 	return nil
 }
 
-func (c *Client) IndexBulkProduct(ctx context.Context, index string, products []*types.Product) error {
+// indexed but not able to delete a record with id (id not found)
+func (c *Client) IndexBulkProductV2(ctx context.Context, index string, products []*types.Product) error {
+	records := make([]map[string]any, 0, len(products))
+	for _, p := range products {
+		log.Printf("the id of prodcut: %d\n", p.ID)
+		record := map[string]any{
+			"_id":         fmt.Sprintf("%d", p.ID),
+			"name":        p.Name,
+			"description": p.Description,
+			"price":       p.Price,
+			"stock":       p.Stock,
+			"@timestamp":  time.Now().UTC(),
+		}
+		records = append(records, record)
+	}
 	payload := map[string]any{
 		"index":   index,
 		"records": products,
 	}
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("failed to marshal bulk payload: %w", err)
-	}
-
-	url := fmt.Sprintf("%s/api/_bulkv2", c.BaseUrl)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/_bulkv2", payload)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Authorization", "Basic "+basicAuth(c.Username, c.Password))
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -152,18 +92,68 @@ func (c *Client) IndexBulkProduct(ctx context.Context, index string, products []
 
 }
 
-func (c *Client) DeleteProduct(ctx context.Context, index string, id int64) error {
-	url := fmt.Sprintf("%s/api/%s/_doc/%d", c.BaseUrl, index, id)
+// not indexed
+func (c *Client) IndexBulkProductv1(ctx context.Context, index string, products []*types.Product) error {
+	var buffer bytes.Buffer
+	for _, p := range products {
+		meta := map[string]map[string]string{
+			"index": {
+				"_index": index,
+				"_id":    fmt.Sprintf("%d", p.ID),
+			},
+		}
+		metaJSON, err := json.Marshal(meta)
+		if err != nil {
+			return err
+		}
+		buffer.Write(metaJSON)
+		buffer.WriteByte('\n')
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+		dataJSON, err := json.Marshal(p)
+		if err != nil {
+			return err
+		}
+		buffer.Write(dataJSON)
+		buffer.WriteByte('\n')
+
+	}
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/_bulk", buffer)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-ndjson")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("bulk v indexing failed: status %d, body: %s", resp.StatusCode, respBody)
+	}
+
+	return nil
+
+}
+func (c *Client) IndexBulkProduct(ctx context.Context, index string, products []*types.Product) error {
+	for _, p := range products {
+		if err := c.IndexProduct(ctx, index, p); err != nil {
+			return fmt.Errorf("failed to index in many products: %v", err)
+		}
+	}
+	return nil
+}
+
+func (c *Client) DeleteProduct(ctx context.Context, index string, id int64) error {
+	url := fmt.Sprintf("/api/%s/_doc/%d", index, id)
+	req, err := c.newRequest(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.SetBasicAuth(c.Username, c.Password)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -175,15 +165,34 @@ func (c *Client) DeleteProduct(ctx context.Context, index string, id int64) erro
 	}
 
 	return nil
-
 }
 
-func basicAuth(username, password string) string {
-	auth := username + ":" + password
-	return base64.StdEncoding.EncodeToString([]byte(auth))
+func (c *Client) DeleteAllProducts(ctx context.Context, index string) error {
+	url := fmt.Sprintf("/api/index/%s", index)
+
+	req, err := c.newRequest(ctx, http.MethodDelete, url, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete index and all documents: status %d, body: %s", resp.StatusCode, respBody)
+	}
+	// create products index
+	if err := c.createIndex(ctx, index); err != nil {
+		return fmt.Errorf("failed to create index after deleting the index: %v", err)
+	}
+
+	return nil
 }
 
-func (c *Client) SearchProduct(ctx context.Context, query string) ([]*types.Product, error) {
+func (c *Client) SearchProduct(ctx context.Context, index string, query string) ([]*types.Product, error) {
 	reqBody := map[string]any{
 		"search_type": "match",
 		"query": map[string]any{
@@ -193,33 +202,16 @@ func (c *Client) SearchProduct(ctx context.Context, query string) ([]*types.Prod
 		"from":       0,
 		"max_result": 10,
 	}
-	body, _ := json.Marshal(reqBody)
-	url := c.BaseUrl + "/api/products/_search"
-	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
-	req.Header.Set("Authorization", "Basic "+basicAuth(c.Username, c.Password))
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
+	url := fmt.Sprintf("/api/%s/_search", index)
+	req, err := c.newRequest(ctx, http.MethodPost, url, reqBody)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	// FOR DEBUGGING
-	// rawBody, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to read response body: %v", err)
-	// }
-
-	// pretty-print the JSON
-	// var pretty bytes.Buffer
-	// if err := json.Indent(&pretty, rawBody, "", "  "); err != nil {
-	// 	fmt.Println("Raw body (not valid JSON):")
-	// 	fmt.Println(string(rawBody))
-	// } else {
-	// 	fmt.Println("Pretty JSON response: ")
-	// 	fmt.Println(pretty.String())
-	// }
 
 	var res struct {
 		Hits struct {
@@ -247,17 +239,12 @@ func (c *Client) createIndex(ctx context.Context, index string) error {
 		"name":         index,
 		"storage_type": "disk",
 	}
-
-	body, _ := json.Marshal(reqBody)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseUrl+"/api/index", bytes.NewReader(body))
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/index", reqBody)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	req.SetBasicAuth(c.Username, c.Password)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -273,14 +260,12 @@ func (c *Client) createIndex(ctx context.Context, index string) error {
 }
 
 func (c *Client) indexExists(ctx context.Context, index string) (bool, error) {
-	url := fmt.Sprintf("%s/api/index/%s", c.BaseUrl, index)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	url := fmt.Sprintf("/api/index/%s", index)
+	req, err := c.newRequest(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return false, err
 	}
-
-	req.SetBasicAuth(c.Username, c.Password)
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return false, err
 	}
