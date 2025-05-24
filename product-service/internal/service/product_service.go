@@ -32,8 +32,11 @@ func (s *ProductService) Create(ctx context.Context, p *types.Product) error {
 	return s.searchIndexer.IndexProduct(ctx, "products", p)
 }
 
-func (s *ProductService) CreateBulk(ctx context.Context, ps []types.Product) error {
-	return s.Repo.CreateBulk(ctx, ps)
+func (s *ProductService) CreateBulk(ctx context.Context, ps []*types.Product) error {
+	if err := s.Repo.CreateBulk(ctx, ps); err != nil {
+		return err
+	}
+	return s.searchIndexer.IndexBulkProduct(ctx, "products", ps)
 }
 
 func (s *ProductService) GetAll(ctx context.Context) ([]types.Product, error) {

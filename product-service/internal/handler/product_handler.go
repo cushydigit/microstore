@@ -44,7 +44,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductHandler) CreateBulk(w http.ResponseWriter, r *http.Request) {
-	var ps []types.Product
+	var ps []*types.Product
 	if err := helpers.ReadJSON(w, r, &ps); err != nil {
 		helpers.ErrorJSON(w, errors.New("Invalid request"))
 		return

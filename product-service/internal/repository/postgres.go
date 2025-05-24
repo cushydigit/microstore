@@ -27,14 +27,14 @@ func (r *PostgresProductRepo) Create(ctx context.Context, p *types.Product) erro
 }
 
 // TODO change the ps types to []*types.Product to include ID for indexing at service layer
-func (r *PostgresProductRepo) CreateBulk(ctx context.Context, ps []types.Product) error {
-	query := `INSERT INTO products (name, description, price, stock ) VALUES ($1, $2, $3, $4)`
-	tx, err := r.DB.Begin()
+func (r *PostgresProductRepo) CreateBulk(ctx context.Context, ps []*types.Product) error {
+	query := `INSERT INTO products (name, description, price, stock ) VALUES ($1, $2, $3, $4) RETURNING id`
+	tx, err := r.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 	// not strictly needed, just pre-compiled and SQL statement allowing to be executed multiple time efficiently
-	stmt, err := tx.Prepare(query)
+	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -42,7 +42,7 @@ func (r *PostgresProductRepo) CreateBulk(ctx context.Context, ps []types.Product
 	defer stmt.Close()
 
 	for _, p := range ps {
-		if _, err := stmt.Exec(p.Name, p.Description, p.Price, p.Stock); err != nil {
+		if err := stmt.QueryRowContext(ctx, p.Name, p.Description, p.Price, p.Stock).Scan(&p.ID); err != nil {
 			tx.Rollback()
 			return err
 		}

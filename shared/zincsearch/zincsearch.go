@@ -118,6 +118,40 @@ func (c *Client) IndexProduct(ctx context.Context, index string, product *types.
 	return nil
 }
 
+func (c *Client) IndexBulkProduct(ctx context.Context, index string, products []*types.Product) error {
+	payload := map[string]any{
+		"index":   index,
+		"records": products,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal bulk payload: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/api/_bulkv2", c.BaseUrl)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Basic "+basicAuth(c.Username, c.Password))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("bulk v2 indexing failed: status %d, body: %s", resp.StatusCode, respBody)
+	}
+
+	return nil
+
+}
+
 func (c *Client) DeleteProduct(ctx context.Context, index string, id int64) error {
 	url := fmt.Sprintf("%s/api/%s/_doc/%d", c.BaseUrl, index, id)
 
