@@ -17,19 +17,20 @@ microstore is a modular e-commerce backend portfolio project built with Go using
 
 ## 🔧 Features
 
-- Auth Service: User registration, login, JWT generation, basic admin logic.
-- Product Service: CRUD operations for products with stock tracking.
-- API Gateway: Central routing with request forwarding, CORS config, and middleware for authentication and admin access.
-- PostgreSQL for persistent storage, easily swappable with in-memory for tests.
-- Unit-tested services with in-memory repos for isolated logic testing.
-- Rate limiter to limit requests per time window based on IP address
-- Product caching to demonstrate caching mechanism
-- Product search based on title or description
-- Separate shared library to isolate reusable and common logic from microservices
-- Ready-made Postman collection for interacting with the API
-- Dockerized using docker-compose for local orchestration.
+- Auth Service: User registration, login, JWT auth, basic admin logic
+- Product Service: CRUD, stock tracking, search, and caching
+- Order Service: Order creation and retrieval with validation
+- API Gateway: Centralized routing with CORS, authentication, and admin middleware
+- PostgreSQL (with optional in-memory mode) for persistence
+- Redis Caching for faster product access
+- ZincSearch-based product search by title/description
+- Rate Limiting by IP to control request flow
+- Shared Library for reusable helpers, middleware, DB, cache, and utils
+- Postman Collection included for easy API testing
+- Dockerized with docker-compose for local orchestration
 
 ## 📁 Structure Overview
+
 ```graphql
 microstore/
 ├── auth-service         # Handles user registration, login, authentication, and rate limitiing
@@ -54,6 +55,7 @@ microstore/
 - Containerizaion: Docker + Docker Compose
 
 ## 🚀 Getting Started
+
 ### Prerequisites
 - Go
 - Docker
