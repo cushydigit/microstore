@@ -73,7 +73,7 @@ make down
 
 ```
 
-## 📚 Service Responsibilites
+## Service Responsibilites
 
 ### Gateway Service
 
@@ -127,7 +127,7 @@ You can use the Postman collection to test all available endpoints:
 [Download Postman Collection](./postman/microstore.api.postman_collection.json)
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/material-astronaut-37601285/cushydigit/folder/w8ksi5h/microstore-api?action=share&creator=21076955&ctx=documentatio)
 
-## 📜 License
+## License
 
 This project is for educational and portfolio purposes. Feel free to use it as a reference or learning resource.
 
