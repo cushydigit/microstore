@@ -14,11 +14,11 @@ microstore is a modular e-commerce backend portfolio project built with Go using
 - API Gateway: Central routing with request forwarding, CORS config, and middleware for authentication and admin access.
 - PostgreSQL for persistent storage, easily swappable with in-memory for tests.
 - Unit-tested services with in-memory repos for isolated logic testing.
-- Ratelimiter for limiting request per windows time base on the ip
-- Caching product for demonstration of cahsing mechanisim.
-- Searching product base on title or description.
-- seprate shared library for seprating the microservice logic from common and repetetive ...
-- ready made postman collection for interacting with API.
+- Rate limiter to limit requests per time window based on IP address
+- Product caching to demonstrate caching mechanism
+- Product search based on title or description
+- Separate shared library to isolate reusable and common logic from microservices
+- Ready-made Postman collection for interacting with the API
 - Dockerized using docker-compose for local orchestration.
 
 ## Structure Overview
@@ -77,23 +77,23 @@ make down
 - Password hashing
 
 ### Product Service (product-service)
-- add/list/delete/search products
-- add product with product validator
-- in-memory or PostgreSQL repository support
-- zincsearch-based indexing
-- redis-base product cache
+- Add/list/delete/search products
+- Add product with product validator
+- In-memory or PostgreSQL repository support
+- Zincsearch-based indexing
+- Redis-based product cache
 
 ### Order Service (order-service)
-- create and fetch orders 
-- create order validator
+- Create and fetch orders 
+- Create order validator
 
-### API Gateway (gateway)
+### API Gateway (`gateway`)
 - Rotues public HTTP traffic
 - Simple routing using GO and chi
 - Handles requests for auth, product, and order endpoint
 - Redus-base Ratelimiter
 
-## License
+## 📜 License
 
 This project is for educational and portfolio purposes. Feel free to use it as a reference or learning resource.
 
