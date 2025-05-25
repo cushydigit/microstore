@@ -1,4 +1,4 @@
-![Go](https://img.shields.io/badge/Go-1.21-blue)
+![Go](https://img.shields.io/badge/Go-1.24-blue)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-blue)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
