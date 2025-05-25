@@ -2,7 +2,6 @@
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-blue)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/material-astronaut-37601285/cushydigit/folder/w8ksi5h/microstore-api?action=share&creator=21076955&ctx=documentatio)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 # 🏬 microstore 
@@ -97,7 +96,8 @@ make down
 ## 📬 Postman Collection
 
 You can use the Postman collection to test all available endpoints:
-[Download Postman Collection](./postman/microstore.postman_collection.json)
+[Download Postman Collection](./postman/microstore.api..postman_collection.json)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/material-astronaut-37601285/cushydigit/folder/w8ksi5h/microstore-api?action=share&creator=21076955&ctx=documentatio)
 
 ## 📜 License
 
