@@ -1,0 +1,718 @@
+{
+	"info": {
+		"_postman_id": "b83d09b5-329a-48d6-b081-a8bc2530173a",
+		"name": "Microstore API",
+		"description": "This collection contains all routes for Microstore's microservices — auth, product, for now.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21076955"
+	},
+	"item": [
+		{
+			"name": "Auth Service",
+			"item": [
+				{
+					"name": "Register-Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@admin.microstore.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.token) {",
+									"    pm.environment.set(\"accessToken\", jsonData.data.token);",
+									"    console.log(\"✅ Token saved to environment variables\");",
+									"    pm.test(\"Token saved to environment variables\", function () {",
+									"        pm.expect(pm.environment.get(\"accessToken\")).to.not.be.null;",
+									"    });",
+									"} else {",
+									"    console.log(\"❌ Token not found in response\");",
+									"    pm.test(\"Token not found in response\", function () {",
+									"        pm.expect.fail(\"Token missing in response\");",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@admin.microstore.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.token) {",
+									"    pm.environment.set(\"accessToken\", jsonData.data.token);",
+									"    console.log(\"✅ Token saved to environment variables\");",
+									"    pm.test(\"Token saved to environment variables\", function () {",
+									"        pm.expect(pm.environment.get(\"accessToken\")).to.not.be.null;",
+									"    });",
+									"} else {",
+									"    console.log(\"❌ Token not found in response\");",
+									"    pm.test(\"Token not found in response\", function () {",
+									"        pm.expect.fail(\"Token missing in response\");",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Service",
+			"item": [
+				{
+					"name": "ListProducts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProduct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const token = pm.environment.get(\"accessToken\")",
+									"",
+									"if (token) {",
+									"    pm.request.headers.add({",
+									"        key: \"Authorization\",",
+									"        value: `Bearer ${token}`",
+									"    });",
+									"}",
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>ID</th>",
+									"        <th>Name</th>",
+									"        <th>Description</th>",
+									"        <th>Price</th>",
+									"        <th>Stock</th>",
+									"    </tr>",
+									"    <tr>",
+									"        <td>{{response.data.id}}</td>",
+									"        <td>{{response.data.name}}</td>",
+									"        <td>{{response.data.description}}</td>",
+									"        <td>{{response.data.price}}</td>",
+									"        <td>{{response.data.stock}}</td>",
+									"    </tr>",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return {response: pm.response.json()}",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateProduct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"4K Monitor\",\n    \"description\": \"27-inch Ultra HD IPS display with HDR and 75Hz refresh rate.\",\n    \"price\": 299.00,\n    \"stock\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateProductBulk",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  { \"name\": \"Wireless Mouse\", \"description\": \"Ergonomic wireless mouse\", \"price\": 19.99, \"stock\": 100 },\n  { \"name\": \"Mechanical Keyboard\", \"description\": \"RGB mechanical keyboard\", \"price\": 49.99, \"stock\": 75 },\n  { \"name\": \"USB-C Hub\", \"description\": \"Multi-port USB-C hub with HDMI\", \"price\": 29.99, \"stock\": 50 },\n  { \"name\": \"Laptop Stand\", \"description\": \"Adjustable aluminum stand\", \"price\": 24.99, \"stock\": 60 },\n  { \"name\": \"Noise Cancelling Headphones\", \"description\": \"Over-ear noise cancelling\", \"price\": 89.99, \"stock\": 40 },\n  { \"name\": \"Webcam 1080p\", \"description\": \"Full HD webcam with mic\", \"price\": 39.99, \"stock\": 80 },\n  { \"name\": \"External SSD 1TB\", \"description\": \"Portable 1TB SSD\", \"price\": 109.99, \"stock\": 30 },\n  { \"name\": \"Gaming Chair\", \"description\": \"Ergonomic gaming chair\", \"price\": 199.99, \"stock\": 20 },\n  { \"name\": \"Bluetooth Speaker\", \"description\": \"Waterproof portable speaker\", \"price\": 34.99, \"stock\": 90 },\n  { \"name\": \"Smartwatch\", \"description\": \"Fitness tracking smartwatch\", \"price\": 79.99, \"stock\": 55 },\n  { \"name\": \"Wireless Charger\", \"description\": \"Fast wireless charging pad\", \"price\": 18.99, \"stock\": 100 },\n  { \"name\": \"LED Desk Lamp\", \"description\": \"Touch control LED lamp\", \"price\": 22.49, \"stock\": 70 },\n  { \"name\": \"Smart Plug\", \"description\": \"Wi-Fi smart outlet plug\", \"price\": 14.99, \"stock\": 200 },\n  { \"name\": \"Phone Tripod\", \"description\": \"Flexible smartphone tripod\", \"price\": 16.99, \"stock\": 120 },\n  { \"name\": \"HDMI Cable 6ft\", \"description\": \"High-speed HDMI 2.0 cable\", \"price\": 9.99, \"stock\": 150 },\n  { \"name\": \"Graphic Tablet\", \"description\": \"Drawing tablet with stylus\", \"price\": 59.99, \"stock\": 25 },\n  { \"name\": \"USB Flash Drive 64GB\", \"description\": \"High-speed USB 3.0 stick\", \"price\": 12.99, \"stock\": 140 },\n  { \"name\": \"Desk Organizer\", \"description\": \"Multi-compartment desk storage\", \"price\": 15.49, \"stock\": 65 },\n  { \"name\": \"Ethernet Cable 10ft\", \"description\": \"Cat6 network cable\", \"price\": 7.99, \"stock\": 130 },\n  { \"name\": \"Monitor 24\\\"\", \"description\": \"Full HD IPS monitor\", \"price\": 129.99, \"stock\": 15 }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RemoveProduct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"4K Monitor\",\n    \"description\": \"27-inch Ultra HD IPS display with HDR and 75Hz refresh rate.\",\n    \"price\": 299.00,\n    \"stock\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product/642",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"642"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RemoveAllProduct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"4K Monitor\",\n    \"description\": \"27-inch Ultra HD IPS display with HDR and 75Hz refresh rate.\",\n    \"price\": 299.00,\n    \"stock\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SearchProduct",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product/search?q=usb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "usb"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{accessToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Order Service",
+			"item": [
+				{
+					"name": "CreateOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"product_id\": 98,\n            \"quantity\": 10\n        },\n        {\n            \"product_id\": 99,\n            \"quantity\": 4\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order/34",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"34"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ListOrdersMine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order/mine",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ListOrders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
