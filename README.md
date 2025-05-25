@@ -34,6 +34,7 @@ microstore/
 ├── Makefile             # Common build and run commands
 
 ```
+
 ## 🧩 Architecture
 
 - Language: GO (Golang)
@@ -92,6 +93,9 @@ make down
 - Simple routing using GO and chi
 - Handles requests for auth, product, and order endpoint
 - Redus-base Ratelimiter
+
+## Request Processing Flow
+![App Screenshot](./src/assets/microstore_api_overview.png)
 
 ## 📬 Postman Collection
 
