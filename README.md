@@ -95,7 +95,8 @@ make down
 - Redus-base Ratelimiter
 
 ## Request Processing Flow
-![App Screenshot](./src/assets/microstore_api_overview.png)
+
+![App Screenshot](./assets/microstore_flow_overview.png)
 
 ## 📬 Postman Collection
 

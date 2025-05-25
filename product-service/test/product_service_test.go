@@ -13,7 +13,7 @@ import (
 func TestProductService(t *testing.T) {
 	ctx := context.Background()
 	repo := repository.NewInMemoryProductRepo()
-	svc := service.NewProductService(repo)
+	svc := service.NewProductService(repo, nil)
 
 	p := &types.Product{
 		Name:        "Test",

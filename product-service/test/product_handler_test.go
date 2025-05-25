@@ -17,7 +17,7 @@ import (
 
 func setupRouter() http.Handler {
 	repo := repository.NewInMemoryProductRepo()
-	svc := service.NewProductService(repo)
+	svc := service.NewProductService(repo, nil)
 	h := handler.NewProductHandler(svc)
 
 	r := chi.NewRouter()
