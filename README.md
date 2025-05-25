@@ -21,7 +21,7 @@ microstore is a modular e-commerce backend portfolio project built with Go using
 - Ready-made Postman collection for interacting with the API
 - Dockerized using docker-compose for local orchestration.
 
-## Structure Overview
+## 📁 Structure Overview
 ```graphql
 microstore/
 ├── auth-service         # Handles user registration, login, authentication, and rate limitiing
@@ -34,7 +34,7 @@ microstore/
 ├── Makefile             # Common build and run commands
 
 ```
-## Architecture
+## 🧩 Architecture
 
 - Language: GO (Golang)
 - Design: Clean Architecture + Modular Packages
@@ -44,7 +44,7 @@ microstore/
 - Search: Zincsearch (product indexing)
 - Containerizaion: Docker + Docker Compose
 
-## Getting Started
+## 🚀 Getting Started
 ### Prerequisites
 - Go
 - Docker
@@ -69,25 +69,25 @@ make down
 
 ```
 
-## Service Details
+## 📚 Service Details
 
-### Auth Service (auth-service)
+### 🔐 Auth Service (`auth-service`)
 - User signup/login
 - JWT authenticaiton
 - Password hashing
 
-### Product Service (product-service)
+### 🛒 Product Service (`product-service`)
 - Add/list/delete/search products
 - Add product with product validator
 - In-memory or PostgreSQL repository support
 - Zincsearch-based indexing
 - Redis-based product cache
 
-### Order Service (order-service)
+### 📦 Order Service (`order-service`)
 - Create and fetch orders 
 - Create order validator
 
-### API Gateway (`gateway`)
+### 🌐 API Gateway (`gateway`)
 - Rotues public HTTP traffic
 - Simple routing using GO and chi
 - Handles requests for auth, product, and order endpoint
