@@ -15,7 +15,7 @@
 microstore is a modular e-commerce backend portfolio project built with Go using a microservices architecture. It demonstrates clean architecture principles, inter-service communication via REST, and containerized deployments using Docker and Docker Compose.
 </p>
 
-## 🔧 Features
+## Features
 
 - Auth Service: User registration, login, JWT auth, basic admin logic
 - Product Service: CRUD, stock tracking, search, and caching
@@ -29,37 +29,30 @@ microstore is a modular e-commerce backend portfolio project built with Go using
 - Postman Collection included for easy API testing
 - Dockerized with docker-compose for local orchestration
 
-## 📁 Structure Overview
 
-```graphql
-microstore/
-├── auth-service         # Handles user registration, login, authentication, and rate limitiing
-├── product-service      # Manages products, supports search and caching
-├── order-service        # Manages customer orders and order workflows
-├── gateway              # API Gateway routing external HTTP traffic to services
-├── shared               # Common utilities, middleware, DB, Redis, search clients
-├── db                   # SQL migrations for initializing databases
-├── docker-compose.yml   # Orchestrates all services with PostgreSQL & Redis
-├── Makefile             # Common build and run commands
+## Technology Stack 
 
-```
+### Core Technologies
 
-## 🧩 Architecture
+- **Language**: Go 1.24
+- **Architecture**: Clean Architecture with microservices
+- **Communication**: REST APIs over HTTP
+- **Containerizaion**: Docker + Docker Compose
 
-- Language: GO (Golang)
-- Design: Clean Architecture + Modular Packages
-- API Communication: REST (HTTP)
-- Databases: PostgreSQL
-- Caching: Redis
-- Search: Zincsearch (product indexing)
-- Containerizaion: Docker + Docker Compose
+### Data Storage
 
-## 🚀 Getting Started
+- **Primary Database**: PostgreSQL with seperate schemas per service
+- **Caching Layer**: Redis for product cashing and rate limiting 
+- **Seach Engine**: Zincsearch for product full-text search
 
-### Prerequisites
-- Go
-- Docker
-- Make
+### Developement Tools
+
+- **Build System**: Makefile with common commands
+- **API Tesing**: Postman collection included
+- **Testing**: In-memory repositories for unit-testing
+
+## Getting Started 🚀
+The project requires `Go` ,`Docker` and `Make` to get started.
 
 clone the repo
 ```bash
@@ -80,35 +73,55 @@ make down
 
 ```
 
-## 📚 Service Details
+## 📚 Service Responsibilites
 
-### 🔐 Auth Service (`auth-service`)
-- User signup/login
-- JWT authenticaiton
-- Password hashing
+### Gateway Service
 
-### 🛒 Product Service (`product-service`)
-- Add/list/delete/search products
-- Add product with product validator
-- In-memory or PostgreSQL repository support
-- Zincsearch-based indexing
-- Redis-based product cache
+The `gateway` service serves as the single entry point, handling:
 
-### 📦 Order Service (`order-service`)
-- Create and fetch orders 
-- Create order validator
+- Request routing to appropriate business sevices
+- JWT authentication validation
+- CORS configuration
+- IP-based rate limiting via Redis
 
-### 🌐 API Gateway (`gateway`)
-- Rotues public HTTP traffic
-- Simple routing using GO and chi
-- Handles requests for auth, product, and order endpoint
-- Redus-base Ratelimiter
+### Business Sevices
+
+Each business service owns its domain and data:
+
+- `auth-service`: User management and JWT token generation
+- `product-service`: Product lifecycle with advanced search and caching
+- `order-service`: Order processing with product validation
+
+### Shared Components
+
+The `shared` module provides common functionality:
+
+- Type definitions for inter-service communication
+- Database connection management
+- Redis client abstraction
+- Zincsearch client abstraction
+- Middleware for authenticaion and validation
+
+## Structure Overview
+
+```tree
+microstore/
+├── auth-service         # Handles user registration, login, authentication, and rate limitiing
+├── product-service      # Manages products, supports search and caching
+├── order-service        # Manages customer orders and order workflows
+├── gateway              # API Gateway routing external HTTP traffic to services
+├── shared               # Common utilities, middleware, DB, Redis, search clients
+├── db                   # SQL migrations for initializing databases
+├── docker-compose.yml   # Orchestrates all services with PostgreSQL & Redis
+├── Makefile             # Common build and run commands
+
+```
 
 ## Request Processing Flow
 
 ![App Screenshot](./assets/microstore_flow_overview.png)
 
-## 📬 Postman Collection
+## Postman Collection
 
 You can use the Postman collection to test all available endpoints:
 [Download Postman Collection](./postman/microstore.api.postman_collection.json)
