@@ -1,11 +1,19 @@
-![Go](https://img.shields.io/badge/Go-1.24-blue)
-![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-blue)
-![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-green)
-
-# 🏬 microstore 
+<h1 align="center">
+    🏬 microstore 
+</h1>
+<p align="center">
+  <a href="https://github.com/cushydigit/microstore/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License MIT">
+  </a>
+  <img src="https://img.shields.io/badge/Go-1.24-blue.svg" alt="React 18+">
+  <img src="https://img.shields.io/badge/Build-Passing-brightgreen.svg" alt="Project Status">
+  <img src="https://img.shields.io/badge/Docker-Enabled-blue.svg" alt="Project Status">
+  <img src="https://img.shields.io/badge/Build-Passing-brightgreen.svg" alt="Project Status">
+  <img src="https://img.shields.io/badge/PostgreSQL-Supported-blue.svg" alt="Project Status">
+</p>
+<p align="center">
 microstore is a modular e-commerce backend portfolio project built with Go using a microservices architecture. It demonstrates clean architecture principles, inter-service communication via REST, and containerized deployments using Docker and Docker Compose.
+</p>
 
 ## 🔧 Features
 
